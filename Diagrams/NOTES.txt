@@ -1,0 +1,2 @@
+CHange NFC thingy
+The charging column shoul have a vatiable for the token

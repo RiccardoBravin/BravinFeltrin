@@ -143,7 +143,28 @@ fact{
     all e:CPOEmployee | e in CPO.employees
 }
 
+//if all charging stations sockets are occupied, the charging column is full
+fact{
+    all c:ChargingColumn |  (no s:Socket | s in c.sockets and s.occupied in False) iff c.isFull = True
+}
 
+
+//all sockets must belong to one and only one charging column
+fact{
+    all s:Socket | no disj c1,c2:ChargingColumn | s in c1.sockets and s in c2.sockets
+    all s:Socket | s in ChargingColumn.sockets
+}
+
+//all startTime must be greater than endTime
+fact{
+    all r:Reservation | r.startTime < r.endTime
+}
+
+//a reservation can be made only if the charging station has a charging column of the required type
+//every reservation charge rate must be  
+fact{
+    all r:Reservation | r.chargeRate in r.chargingStation.chargingColumns.type
+}
 
 //assertion
 
@@ -153,16 +174,26 @@ assert Correct_numbering{
     
 }
 
+assert Check_CC_Status{
+    all c:ChargingColumn | c.isFull = False
+    all s:Socket | s.occupied = True 
+    #sockets > 0
+}
+
 //run
+
 run {
     all s:String | s in "a"+"b"+"c"+"d"
-    //#Reservation > 0
+    //#Reservation = 1 
 }
 
 check Correct_numbering
+
+check Check_CC_Status
 
 check{
     #DSO < 1
     #ChargingColumn >= #ChargingStation 
 }
+
  

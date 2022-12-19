@@ -4,7 +4,6 @@ abstract sig Bool{}
 one sig True extends Bool{}
 one sig False extends Bool{}
 
-
 //simplified date signature
 sig Date{
     val : one Int
@@ -80,7 +79,8 @@ sig ChargingColumn{
 
 sig CPO{
     name: one String,
-    employees: some CPOEmployee
+    employees: some CPOEmployee,
+    chargingStations: some ChargingStation
 }
 
 sig CPOEmployee{
@@ -160,19 +160,33 @@ fact{
     all r:Reservation | r.startTime < r.endTime
 }
 
-//a reservation can be made only if the charging station has a charging column of the required type
-//every reservation charge rate must be  
+//a reservation can be made only if the charging station has a charging column of the required type 
 fact{
     all r:Reservation | r.chargeRate in r.chargingStation.chargingColumns.type
 }
 
-//assertion
-
-assert Correct_numbering{
-    #chargingStation = #Coordinate and
-    no disj u1, u2:User | u1.email = u2.email
-    
+//users mail and username must be unique
+fact{
+    all disj u1,u2:User | u1.email != u2.email or u1.username != u2.username
 }
+
+//Strings exist
+fact{
+    all s:String | s in "a"+"b"+"c"+"d"
+}
+
+//all CPOEmployees must work in a charging station that belongs to the CPO they work for
+fact{
+    all c:CPO | c.employees.workPlace in c.chargingStations
+}
+
+//all charging station must belong to one and only one CPO
+fact{
+    all c:ChargingStation | no disj c1,c2:CPO | c in c1.chargingStations and c in c2.chargingStations
+    all c:ChargingStation | c in CPO.chargingStations
+}
+
+//assertion
 
 assert Check_CC_Status{
     all c:ChargingColumn | c.isFull = False
@@ -180,20 +194,88 @@ assert Check_CC_Status{
     #sockets > 0
 }
 
+//PREDICATES
+
+//dynamic predicates
+
+//add a new card to user
+pred addCardToUser[u,u':User, c:Card]{
+    u'.paymentMethod = u.paymentMethod + c
+}
+
+//add a new reservation
+pred addReservation[r,r':Reservation, cr:ChargeRate, cs:ChargingStation, u:User,]{
+    r'.chargeRate = cr
+    r'.chargingStation = cs
+    r != r'
+}
+
+//change DSO for a charging station
+pred changeDSO[c:ChargingStation, d,d':DSO]{
+    d != d' and 
+    d.energyCost >= d'.energyCost and
+    c.supplier = d'
+}
+
+//Charging station changes price
+pred changePrice[c:ChargingStation, p,p':Int]{
+    c.energyCost = p and
+    p != p' 
+}
+
+//worlds
+pred eMSPWorld{
+    #ChargingStation = 0
+    #DSO = 0
+    #Reservation = 0
+    #User = 2
+    #Card = 3
+    #Email = 1
+}
+
+pred CPMSWorld{
+    #ChargingStation = 2
+    #DSO = 2
+    #Reservation = 0
+    #CPO = 2
+    #CPOEmployee = 3
+    #Socket = 6
+}
+
+pred World{
+    #Reservation = 2
+    #User = 2
+    #Card = 1
+    #Email = 2
+    #ChargingStation = 2
+    #ChargingColumn = 2
+    #Socket = 3
+    #DSO = 1
+}
+
 //run
 
 run {
-    all s:String | s in "a"+"b"+"c"+"d"
+    
     //#Reservation = 1 
 }
 
-check Correct_numbering
+run eMSPWorld for 20
+run CPMSWorld for 20
+run World
 
+
+run addReservation
+
+run addCardToUser
+
+run changeDSO
+
+run changePrice
+
+//checks
 check Check_CC_Status
 
-check{
-    #DSO < 1
-    #ChargingColumn >= #ChargingStation 
-}
+
 
  

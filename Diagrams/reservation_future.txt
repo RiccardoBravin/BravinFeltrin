@@ -1,0 +1,36 @@
+title Future reservation
+actor Unregistered User
+participant eMSP App
+participant eMSP Server
+
+activate eMSP App
+Unregistered User->eMSP App:Use search bar
+
+
+
+eMSP App->eMSP Server: getCS(location)
+activate eMSP Server
+Unregistered User<--eMSP App: Show requested location
+eMSP App<--eMSP Server: CSInformations 
+deactivate eMSP Server
+Unregistered User<--eMSP App: Show CS in area
+
+
+
+Unregistered User->eMSP App:Selects CS
+Unregistered User<--eMSP App:Display CS slots and info
+
+Unregistered User->eMSP App:Submit reservation data
+
+eMSP App->eMSP App:VerifyData
+activate eMSP App
+space 
+deactivate eMSP App
+
+eMSP App->eMSP Server: RequestReservation(Data)
+activate eMSP Server
+
+eMSP App<--eMSP Server: Confirmation message
+deactivate eMSP Server
+Unregistered User<--eMSP App:Show confirmation
+deactivate eMSP App

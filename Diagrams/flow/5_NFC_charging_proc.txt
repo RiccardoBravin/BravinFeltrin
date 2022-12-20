@@ -1,0 +1,68 @@
+title NFC charging
+actor Registered User
+participant eMSP App
+participant eMSP Server
+participant CPMS
+
+
+
+
+
+Registered User->eMSP App:Select reservation
+Registered User<--eMSP App: Instructions 
+
+Registered User->eMSP App:NFC tag readout
+
+eMSP App->eMSP Server: submitColumnToken(data)
+activate eMSP Server
+
+eMSP Server->CPMS:submitColumnToken(data)
+activate CPMS
+eMSP Server<--CPMS:confirm reservation
+
+CPMS->CPMS:unlockSocket()
+
+parallel on
+CPMS-->eMSP Server: Confirmation
+eMSP Server-->eMSP App: Confirmation
+eMSP App-->Registered User: Confirmation
+parallel off
+space
+
+deactivate eMSP Server
+
+Registered User->Registered User:Plug Car
+
+Registered User->Registered User:Waiting
+
+
+parallel  on
+CPMS->eMSP Server:DoneCharging
+eMSP Server->eMSP App: DoneCharging
+eMSP App->Registered User: Notify user of\ncomplete charge
+parallel off
+
+activate eMSP App
+activate eMSP Server
+
+Registered User->Registered User:Unplug Car
+
+CPMS->CPMS:lockSocket()
+
+parallel  on
+CPMS->eMSP Server:ChargingBill(data)
+eMSP Server->eMSP App: ChargingBill(data)
+parallel off
+
+eMSP App->eMSP App:ProcessPayment
+deactivate eMSP Server
+
+
+eMSP App->Registered User: Show final bill
+deactivate eMSP App
+
+CPMS->CPMS:freeRemaining\nTimeframe()
+deactivate CPMS
+
+
+

@@ -1,0 +1,17 @@
+title modify CPMS battery policy
+actor CPMS employee
+participant CPMS
+
+activate CPMS
+CPMS employee->CPMS:Select manual\nmanagement 
+CPMS-->CPMS employee:Show battery status
+
+CPMS employee->CPMS:Submit desired \nbattery level target
+
+
+CPMS->CPMS: changeBatteryTarget(data)
+activate CPMS
+space
+deactivate CPMS
+
+CPMS employee<--CPMS: Confirmation 

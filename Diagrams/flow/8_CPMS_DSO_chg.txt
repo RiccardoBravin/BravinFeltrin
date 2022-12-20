@@ -1,0 +1,29 @@
+title manually change DSO
+actor CPMS employee
+participant CPMS
+
+activate CPMS
+CPMS employee->CPMS:Click change DSO 
+CPMS-->CPMS employee:Show DSO \nchange form
+
+CPMS employee->CPMS:Submit DSO \nchange filters
+
+
+CPMS->CPMS: retrieveDSOs()
+activate CPMS
+space
+deactivate CPMS
+
+CPMS employee<--CPMS: Show DSO list 
+
+
+CPMS employee->CPMS:Select DSO
+
+CPMS->CPMS: PerformDSOChange()
+activate CPMS
+space
+deactivate CPMS
+
+CPMS employee<--CPMS: Confirmation
+
+

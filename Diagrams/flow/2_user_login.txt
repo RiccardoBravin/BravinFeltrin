@@ -1,0 +1,19 @@
+title eMSP login
+actor Registered User
+participant eMSP App
+participant eMSP Server
+
+activate eMSP App
+Registered User->eMSP App:Click login button
+eMSP App-->Registered User:Show login form
+
+Registered User->eMSP App:Submit login data
+
+
+eMSP App->eMSP Server: checkLogin(data)
+activate eMSP Server
+
+eMSP App<--eMSP Server: LoginGranted 
+deactivate eMSP Server
+Registered User<--eMSP App: Show Main Page
+

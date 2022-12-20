@@ -1,0 +1,18 @@
+title CPMS employee login
+actor CPMS employee
+participant CPMS
+
+activate CPMS
+CPMS employee->CPMS:Click login button
+CPMS-->CPMS employee:Show login form
+
+CPMS employee->CPMS:Submit login data
+
+
+CPMS->CPMS: checkLogin(data)
+activate CPMS
+space
+deactivate CPMS
+
+CPMS employee<--CPMS: Show Main Page
+

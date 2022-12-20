@@ -1,8 +1,18 @@
-//Signatures of all main objects
+//signatures of all main objects
 
 abstract sig Bool{}
 one sig True extends Bool{}
 one sig False extends Bool{}
+
+//simplified date signature
+sig Date{
+    val : one Int
+}
+
+sig Coordinate{
+    lat : one Int,
+    lon : one Int
+}
 
 abstract sig ChargeRate{}
 one sig Slow extends ChargeRate{}
@@ -14,15 +24,6 @@ one sig Green extends EnergyType{}
 one sig Carbon extends EnergyType{}
 one sig Nuclear extends EnergyType{}
 
-//simplified date signature
-sig Date{
-    val : one Int
-}
-
-sig Coordinate{
-    lat : one Int,
-    lon : one Int
-}
 
 sig Email{
     val: one String,
@@ -92,7 +93,7 @@ sig Socket{
     occupied: one Bool,
 }
 
-//Constraints to be satisfied by the model
+
 
 //all users must have verified mail and payment method to make a reservation
 fact {
@@ -185,7 +186,7 @@ fact{
     all c:ChargingStation | c in CPO.chargingStations
 }
 
-//Assertions to be verified
+//assertion
 
 assert Check_CC_Status{
     all c:ChargingColumn | c.isFull = False
@@ -222,7 +223,7 @@ pred changePrice[c:ChargingStation, p,p':Int]{
     p != p' 
 }
 
-//Worlds
+//worlds
 pred eMSPWorld{
     #ChargingStation = 0
     #DSO = 0

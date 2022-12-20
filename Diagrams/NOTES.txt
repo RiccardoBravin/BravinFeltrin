@@ -1,2 +1,4 @@
 CHange NFC thingy
 The charging column shoul have a vatiable for the token
+
+Payment method and mail confirmation both accepted

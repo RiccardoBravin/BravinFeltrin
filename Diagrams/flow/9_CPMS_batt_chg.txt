@@ -1,4 +1,4 @@
-title modify CPMS battery policy
+title Modify CPMS battery policy
 actor CPMS employee
 participant CPMS
 

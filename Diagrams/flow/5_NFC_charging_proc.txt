@@ -1,4 +1,5 @@
-title NFC charging
+title Charging process
+
 actor Registered User
 participant eMSP App
 participant eMSP Server
@@ -6,17 +7,20 @@ participant CPMS
 
 
 
-
+activate eMSP App
 
 Registered User->eMSP App:Select reservation
 Registered User<--eMSP App: Instructions 
 
+alt NFC enabled
 Registered User->eMSP App:NFC tag readout
-
-eMSP App->eMSP Server: submitColumnToken(data)
+else NFC disabled
+Registered User->eMSP App:Insert column token
+end
+eMSP App->eMSP Server:requestUnlock(resID,colTok)
 activate eMSP Server
 
-eMSP Server->CPMS:submitColumnToken(data)
+eMSP Server->CPMS:requestUnlock(resID,colTok)
 activate CPMS
 eMSP Server<--CPMS:confirm reservation
 
@@ -29,6 +33,7 @@ eMSP App-->Registered User: Confirmation
 parallel off
 space
 
+deactivate eMSP App
 deactivate eMSP Server
 
 Registered User->Registered User:Plug Car

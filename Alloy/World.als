@@ -227,9 +227,9 @@ pred eMSPWorld{
     #ChargingStation = 0
     #DSO = 0
     #Reservation = 0
-    #User = 2
-    #Card = 3
-    #Email = 1
+    #User = 3
+    #Card = 2
+    #Email = 2
 }
 
 pred CPMSWorld{

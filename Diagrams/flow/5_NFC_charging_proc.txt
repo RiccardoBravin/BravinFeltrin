@@ -1,40 +1,40 @@
 title Charging process
 
 actor Registered User
-participant eMSP App
-participant eMSP Server
+participant eMSP
+participant eMSP
 participant CPMS
 
 
 
-activate eMSP App
+activate eMSP
 
-Registered User->eMSP App:Select reservation
-Registered User<--eMSP App: Instructions 
+Registered User->eMSP:Select reservation
+Registered User<--eMSP: Instructions 
 
 alt NFC enabled
-Registered User->eMSP App:NFC tag readout
+Registered User->eMSP:NFC tag readout
 else NFC disabled
-Registered User->eMSP App:Insert column token
+Registered User->eMSP:Insert column token
 end
-eMSP App->eMSP Server:requestUnlock(resID,colTok)
-activate eMSP Server
 
-eMSP Server->CPMS:requestUnlock(resID,colTok)
+
+
+eMSP->CPMS:requestUnlock(resID,colTok)
 activate CPMS
-eMSP Server<--CPMS:confirm reservation
+eMSP<--CPMS:confirm reservation
 
 CPMS->CPMS:unlockSocket()
 
 parallel on
-CPMS-->eMSP Server: Confirmation
-eMSP Server-->eMSP App: Confirmation
-eMSP App-->Registered User: Confirmation
+CPMS-->eMSP: Confirmation
+
+eMSP-->Registered User: Confirmation
 parallel off
 space
 
-deactivate eMSP App
-deactivate eMSP Server
+deactivate eMSP
+
 
 Registered User->Registered User:Plug Car
 
@@ -42,29 +42,30 @@ Registered User->Registered User:Waiting
 
 
 parallel  on
-CPMS->eMSP Server:DoneCharging
-eMSP Server->eMSP App: DoneCharging
-eMSP App->Registered User: Notify user of\ncomplete charge
+CPMS->eMSP:DoneCharging
+
+eMSP->Registered User: Notify user of\ncomplete charge
 parallel off
 
-activate eMSP App
-activate eMSP Server
+activate eMSP
+
 
 Registered User->Registered User:Unplug Car
 
 CPMS->CPMS:lockSocket()
 
 parallel  on
-CPMS->eMSP Server:ChargingBill(data)
-eMSP Server->eMSP App: ChargingBill(data)
+CPMS->eMSP:ChargingBill(data)
 parallel off
 
-eMSP App->eMSP App:ProcessPayment
-deactivate eMSP Server
+eMSP->eMSP:ProcessPayment
+activate eMSP
+space
+deactivate eMSP
 
 
-eMSP App->Registered User: Show final bill
-deactivate eMSP App
+eMSP->Registered User: Show final bill
+deactivate eMSP
 
 CPMS->CPMS:freeRemaining\nTimeframe()
 deactivate CPMS

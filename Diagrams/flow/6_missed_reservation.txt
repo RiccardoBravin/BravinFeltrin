@@ -1,32 +1,31 @@
 title Missed reservation
 actor Registered User
-participant eMSP App
-participant eMSP Server
+participant eMSP
+participant eMSP
 participant CPMS
 
 entryspacing 0.9
 
 activate CPMS
 parallel  on
-CPMS->eMSP Server:TimeoutForReservation(data)
+CPMS->eMSP:TimeoutForReservation(data)
 
-activate eMSP Server
-eMSP Server->eMSP App:TimeoutForReservation
-activate eMSP App
+activate eMSP
+
 parallel off
 
-eMSP App->Registered User:Notify of \nmissed reservation
-deactivate eMSP Server
+eMSP->Registered User:Notify of \nmissed reservation
+
 
 parallel on
 CPMS->CPMS:freeRemaining\nTimeframe()
-eMSP App->Registered User:Notify of fee \nwithholding
+eMSP->Registered User:Notify of fee \nwithholding
 parallel off
 
-eMSP App->eMSP App:ProcessPayment
+eMSP->eMSP:ProcessPayment
 
 
 deactivate CPMS
-deactivate eMSP App
+deactivate eMSP
 
 

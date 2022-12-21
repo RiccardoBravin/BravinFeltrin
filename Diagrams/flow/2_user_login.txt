@@ -1,19 +1,19 @@
 title eMSP login
 actor Registered User
-participant eMSP App
-participant eMSP Server
+participant eMSP
+participant eMSP
 
-activate eMSP App
-Registered User->eMSP App:Click login button
-eMSP App-->Registered User:Show login form
+activate eMSP
+Registered User->eMSP:Click login button
+eMSP-->Registered User:Show login form
 
-Registered User->eMSP App:Submit login data
+Registered User->eMSP:Submit login data
 
 
-eMSP App->eMSP Server: checkLogin(data)
-activate eMSP Server
+eMSP->eMSP: checkLogin(data)
+activate eMSP
+space
+deactivate eMSP
 
-eMSP App<--eMSP Server: LoginGranted 
-deactivate eMSP Server
-Registered User<--eMSP App: Show Main Page
+Registered User<--eMSP: Show Main Page
 

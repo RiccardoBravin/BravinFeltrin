@@ -1,36 +1,39 @@
 title Future reservation
+
 actor Registered User
-participant eMSP App
-participant eMSP Server
+participant eMSP
+participant eMSP
 
-activate eMSP App
-Registered User->eMSP App:Use search bar
+participant CPMS
 
-
-
-eMSP App->eMSP Server: getCS(location)
-activate eMSP Server
-Registered User<--eMSP App: Show requested location
-eMSP App<--eMSP Server: CSInformations 
-deactivate eMSP Server
-Registered User<--eMSP App: Show CS in area
+activate eMSP
+Registered User->eMSP:Use search bar
 
 
 
-Registered User->eMSP App:Selects CS
-Registered User<--eMSP App:Display CS slots and info
+eMSP->eMSP: getCS(location)
+activate eMSP
+Registered User<--eMSP: Show requested location
+Registered User<--eMSP: Show CS nearby
+deactivate eMSP
 
-Registered User->eMSP App:Submit reservation data
 
-eMSP App->eMSP App:VerifyData
-activate eMSP App
+
+
+Registered User->eMSP:Selects CS
+Registered User<--eMSP:Display CS slots and info
+
+Registered User->eMSP:Submit reservation data
+
+eMSP->eMSP:VerifyData
+activate eMSP
 space 
-deactivate eMSP App
+deactivate eMSP
 
-eMSP App->eMSP Server: RequestReservation(Data)
-activate eMSP Server
+eMSP->CPMS: RequestReservation(Data)
+activate CPMS
 
-eMSP App<--eMSP Server: Confirmation message
-deactivate eMSP Server
-Registered User<--eMSP App:Show confirmation
-deactivate eMSP App
+CPMS-->eMSP: Confirmation message
+deactivate CPMS
+Registered User<--eMSP:Show confirmation
+deactivate eMSP

@@ -1,24 +1,24 @@
 title User registration
 actor Unregistered User
-participant eMSP App
-participant eMSP Server
-
-activate eMSP App
-Unregistered User->eMSP App:Click register button
-
-Unregistered User<--eMSP App: Show Form
+participant eMSP
 
 
-Unregistered User->eMSP App:User submits data
+participant eMSP
+participant eMSP
 
-eMSP App->eMSP Server: RegistrationInfo(Data)
-activate eMSP Server
+activate eMSP
+Unregistered User->eMSP:Click register button
 
-eMSP Server->eMSP Server:ValidateData
-activate eMSP Server
+Unregistered User<--eMSP: Show Form
+
+
+Unregistered User->eMSP:User submits data
+
+
+eMSP->eMSP:ValidateRegistration(Data)
+activate eMSP
 space 
-deactivate eMSP Server
-eMSP App<--eMSP Server: Successfull registration
-deactivate eMSP Server
-Unregistered User<--eMSP App:Show main interface
-deactivate eMSP App
+deactivate eMSP
+
+Unregistered User<--eMSP:Show successfull registration
+deactivate eMSP

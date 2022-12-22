@@ -1,0 +1,98 @@
+title User registration
+
+actor Unregistered User
+participant MainActivity
+participant SigningActivity
+participant RegistrationService
+participant PaymentAPI
+database eMSP DBMS
+
+
+activate MainActivity
+
+Unregistered User->MainActivity:Open APP
+
+MainActivity->MainActivity:isLogged()
+
+activate MainActivity
+MainActivity->>SigningActivity:StartSigningActivity
+deactivate MainActivity
+deactivate MainActivity
+
+activate SigningActivity
+SigningActivity-->Unregistered User: ShowInterface
+
+
+
+Unregistered User->SigningActivity:Click register button
+
+Unregistered User<--SigningActivity:ShowRegistrationForm
+
+
+Unregistered User->SigningActivity:Submit data
+
+SigningActivity->SigningActivity:ValidateInput()
+
+alt isValid
+
+	SigningActivity->RegistrationService:newUser(Data)
+	
+	activate RegistrationService
+	RegistrationService->eMSP DBMS:inserIncompleteUser(Data)
+	activate eMSP DBMS
+
+
+	alt User inserted
+
+	eMSP DBMS-->RegistrationService:Completed
+    deactivate eMSP DBMS
+
+	RegistrationService->RegistrationService:verifyMail(Mail)
+    
+    
+	
+    
+    	
+    RegistrationService->PaymentAPI:checkPaymentMethod
+    activate PaymentAPI
+   PaymentAPI-->RegistrationService:ValidPaymentMethod
+    deactivate PaymentAPI
+    
+    RegistrationService->eMSP DBMS:ActivateUser
+    activate eMSP DBMS
+    eMSP DBMS-->RegistrationService:Activated
+    deactivate eMSP DBMS
+    RegistrationService-->SigningActivity:OK
+    deactivate RegistrationService
+    SigningActivity-->Unregistered User:Successfull signin
+    
+    SigningActivity->MainActivity:StartMainActivity
+    deactivate SigningActivity
+    activate MainActivity
+    MainActivity-->Unregistered User:Show
+    space
+    deactivate MainActivity
+    
+   
+
+	else User already registered
+    activate eMSP DBMS
+    eMSP DBMS-->RegistrationService:FailedInsertion
+	deactivate eMSP DBMS
+    activate RegistrationService
+    RegistrationService-->SigningActivity:Failed
+    deactivate RegistrationService
+    activate SigningActivity
+    SigningActivity-->Unregistered User:Failed
+    space
+    deactivate SigningActivity
+    
+    
+	end
+else notValid
+
+activate SigningActivity
+SigningActivity-->Unregistered User:Invalid data
+space 
+deactivate SigningActivity
+end

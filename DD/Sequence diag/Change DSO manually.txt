@@ -1,0 +1,6 @@
+title Change DSO manually
+
+actor CPO Employee
+participant UserInterfaceManager
+participant EMSP_DSOManager
+participant DSO_API

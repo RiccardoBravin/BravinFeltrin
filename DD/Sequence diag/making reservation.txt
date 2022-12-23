@@ -75,7 +75,7 @@ ReservationActivity->ReservationActivity:ValidateInput()
 ReservationActivity->CPMS_ReservationService: RequestReservation(date,info)
 activate CPMS_ReservationService
 
-CPMS_ReservationService->Reservations_Database:insert(res)
+CPMS_ReservationService->Reservations_Database:insert(reservation)
 activate Reservations_Database
 alt correctly inserted
 

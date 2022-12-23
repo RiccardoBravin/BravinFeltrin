@@ -3,9 +3,10 @@ title User registration
 actor Unregistered User
 participant MainActivity
 participant SigningActivity
-participant RegistrationService
+participant eMSP_RegistrationService
+database Users DBMS
 participant PaymentAPI
-database eMSP DBMS
+
 
 
 activate MainActivity
@@ -35,35 +36,35 @@ SigningActivity->SigningActivity:ValidateInput()
 
 alt isValid
 
-	SigningActivity->RegistrationService:newUser(Data)
+	SigningActivity->eMSP_RegistrationService:newUser(Data)
 	
-	activate RegistrationService
-	RegistrationService->eMSP DBMS:inserIncompleteUser(Data)
-	activate eMSP DBMS
+	activate eMSP_RegistrationService
+	eMSP_RegistrationService->Users DBMS:inserIncompleteUser(Data)
+	activate Users DBMS
 
 
 	alt User inserted
 
-	eMSP DBMS-->RegistrationService:Completed
-    deactivate eMSP DBMS
+	Users DBMS-->eMSP_RegistrationService:Completed
+    deactivate Users DBMS
 
-	RegistrationService->RegistrationService:verifyMail(Mail)
+	eMSP_RegistrationService->eMSP_RegistrationService:verifyMail(Mail)
     
     
 	
     
     	
-    RegistrationService->PaymentAPI:checkPaymentMethod
+    eMSP_RegistrationService->PaymentAPI:checkPaymentMethod
     activate PaymentAPI
-   PaymentAPI-->RegistrationService:ValidPaymentMethod
+   PaymentAPI-->eMSP_RegistrationService:ValidPaymentMethod
     deactivate PaymentAPI
     
-    RegistrationService->eMSP DBMS:ActivateUser
-    activate eMSP DBMS
-    eMSP DBMS-->RegistrationService:Activated
-    deactivate eMSP DBMS
-    RegistrationService-->SigningActivity:OK
-    deactivate RegistrationService
+    eMSP_RegistrationService->Users DBMS:ActivateUser
+    activate Users DBMS
+    Users DBMS-->eMSP_RegistrationService:Activated
+    deactivate Users DBMS
+    eMSP_RegistrationService-->SigningActivity:OK
+    deactivate eMSP_RegistrationService
     SigningActivity-->Unregistered User:Successfull signin
     
     SigningActivity->MainActivity:StartMainActivity
@@ -76,12 +77,12 @@ alt isValid
    
 
 	else User already registered
-    activate eMSP DBMS
-    eMSP DBMS-->RegistrationService:FailedInsertion
-	deactivate eMSP DBMS
-    activate RegistrationService
-    RegistrationService-->SigningActivity:Failed
-    deactivate RegistrationService
+    activate Users DBMS
+    Users DBMS-->eMSP_RegistrationService:FailedInsertion
+	deactivate Users DBMS
+    activate eMSP_RegistrationService
+    eMSP_RegistrationService-->SigningActivity:Failed
+    deactivate eMSP_RegistrationService
     activate SigningActivity
     SigningActivity-->Unregistered User:Failed
     space

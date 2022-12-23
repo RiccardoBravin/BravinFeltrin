@@ -1,22 +1,27 @@
 title Missed reservation
 
-participant CPMS_reservationService
-database ReservationDatabase
-participant eMSP_notificationService
+participant CPMS_ReservationService
+database Reservation DBMS
+participant eMSP_NotificationService
 participant app_notificationService
 actor eMSP registered user
-activate CPMS_reservationService
-activate ReservationDatabase
-CPMS_reservationService->ReservationDatabase:deleteReservation
-ReservationDatabase-->CPMS_reservationService:done
-deactivate ReservationDatabase
-activate eMSP_notificationService
+
+
+activate CPMS_ReservationService
+activate Reservation DBMS
+
+CPMS_ReservationService->Reservation DBMS:deleteReservation
+Reservation DBMS-->CPMS_ReservationService:done
+deactivate Reservation DBMS
+
+activate eMSP_NotificationService
 activate app_notificationService
-CPMS_reservationService->eMSP_notificationService:missedReservation(data)
-eMSP_notificationService-->CPMS_reservationService: OK
-app_notificationService->>eMSP_notificationService:periodicNotificationCheck
-eMSP_notificationService-->app_notificationService: missedReservation(data)
+CPMS_ReservationService->eMSP_NotificationService:missedReservation(data)
+eMSP_NotificationService-->CPMS_ReservationService: OK
+app_notificationService->>eMSP_NotificationService:periodicNotificationCheck
+
 alt missedReservation 
+eMSP_NotificationService-->app_notificationService: missedReservation(data)
 app_notificationService->eMSP registered user:missedReservationNotification
 end
 

@@ -6,10 +6,11 @@ participant chargingActivity
 participant appNotificationService
 participant eMSP_notificationService
 participant CPOs_API
-participant chargingCol_API
-participant switcher_API
+participant chargingCol_API		//chargingCulumn
+participant switcher_API		//switcher
 participant payment_API
-participant CPMS_chargingService
+participant CPMS_chargingService	
+participant batteryPack_API		//batteryPack
 database reservationDatabase
 
 
@@ -43,14 +44,25 @@ alt validToken
         eMSP user->chargingCol_API:plugCar(socket)
         activate chargingCol_API
         chargingCol_API->CPMS_chargingService:carPlugged(chargeLevel, socket)	
-        CPMS_chargingService->CPMS_chargingService:choosePowerSource
+CPMS_chargingService->batteryPack_API:getStoredPrice
+activate batteryPack_API
+batteryPack_API-->CPMS_chargingService:storedPrice
+deactivate batteryPack_API
+alt stored price lower than current one
+CPMS_chargingService->switcher_API:startSupplyWithBattery
+activate switcher_API
+switcher_API-->CPMS_chargingService:OK
+deactivate switcher_API
+else 
+CPMS_chargingService->switcher_API:startSupplyWithDSO
+activate switcher_API
+switcher_API-->CPMS_chargingService:OK
+deactivate switcher_API
+end
         activate CPMS_chargingService
         space
         deactivate CPMS_chargingService
-        CPMS_chargingService->switcher_API:startSupplying(column, socket, source)
-        activate switcher_API
-        switcher_API-->CPMS_chargingService:OK
-        deactivate switcher_API
+        
         CPMS_chargingService->>chargingCol_API:periodicLevelCheck
         chargingCol_API-->CPMS_chargingService:chargingLevel
         alt fullCharge or time-frame out

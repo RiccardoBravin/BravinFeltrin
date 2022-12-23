@@ -1,28 +1,28 @@
 title CPMS employee login
 
 actor CPMS employee
-participant CPMS_userInterfaceManager
+participant CPMS_loginUI
 participant CPO_API
-participant CPMS_userInterfaceManager
+participant CPMS_loginUI
 participant CPMS employee
-CPMS employee->CPMS_userInterfaceManager:login(data)
-activate CPMS_userInterfaceManager
-CPMS_userInterfaceManager->CPMS_userInterfaceManager:ValidateInput()
+CPMS employee->CPMS_loginUI:login(data)
+activate CPMS_loginUI
+CPMS_loginUI->CPMS_loginUI:ValidateInput()
 alt isValid
-CPMS_userInterfaceManager->CPO_API:checkEmployee(data)
+CPMS_loginUI->CPO_API:checkEmployee(data)
 	activate CPO_API
 	alt validEmployee
-    CPO_API-->CPMS_userInterfaceManager:validEmployee
+    CPO_API-->CPMS_loginUI:validEmployee
     deactivate CPO_API
-    CPMS_userInterfaceManager-->CPMS employee:Successfull login
+    CPMS_loginUI-->CPMS employee:Successfull login
     else User already registered
  	activate CPO_API
-    CPO_API-->CPMS_userInterfaceManager:invalidEmployee
+    CPO_API-->CPMS_loginUI:invalidEmployee
     deactivate CPO_API
-    CPMS_userInterfaceManager-->CPMS employee:Failed
+    CPMS_loginUI-->CPMS employee:Failed
     space
 end
 else notValid
-CPMS_userInterfaceManager-->CPMS employee:Invalid data
+CPMS_loginUI-->CPMS employee:Invalid data
 space 
 end 

@@ -2,5 +2,5 @@ title Change DSO manually
 
 actor CPO Employee
 participant UserInterfaceManager
-participant EMSP_DSOManager
+participant CPMS_DSOManager//CPMS_DSOManagingService
 participant DSO_API

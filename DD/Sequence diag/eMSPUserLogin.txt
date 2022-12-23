@@ -3,7 +3,7 @@ title eMSP user login
 actor registered User
 participant MainActivity
 participant SigningActivity
-participant CPMS_AuthorizationService
+participant CPMS_AuthorizationService  ///// eMSP_RegistrationService
 
 database eMSP DBMS
 

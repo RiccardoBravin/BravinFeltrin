@@ -1,0 +1,86 @@
+title eMSP user login
+
+actor registered User
+participant MainActivity
+participant SigningActivity
+participant CPMS_AuthorizationService
+
+database eMSP DBMS
+
+
+participant SigningActivity
+
+participant registered User
+
+activate MainActivity
+
+registered User->MainActivity:Open APP
+
+MainActivity->MainActivity:isLogged()
+
+activate MainActivity
+MainActivity->>SigningActivity:StartSigningActivity
+deactivate MainActivity
+deactivate MainActivity
+
+activate SigningActivity
+SigningActivity-->registered User: ShowInterface
+
+
+
+registered User->SigningActivity:Click login button
+
+registered User<--SigningActivity:ShowLoginForm
+
+
+registered User->SigningActivity:Submit data
+
+SigningActivity->SigningActivity:ValidateInput()
+
+alt isValid
+
+	SigningActivity->CPMS_AuthorizationService:Login(Data)
+	
+	activate CPMS_AuthorizationService
+	CPMS_AuthorizationService->eMSP DBMS:checkUser(Data)
+	activate eMSP DBMS
+
+
+	alt isRegistered
+
+	eMSP DBMS-->CPMS_AuthorizationService:isRegistered
+    deactivate eMSP DBMS
+    CPMS_AuthorizationService-->SigningActivity:OK
+    deactivate CPMS_AuthorizationService
+    SigningActivity-->registered User:Successfull login
+    
+    SigningActivity->MainActivity:StartMainActivity
+    deactivate SigningActivity
+    activate MainActivity
+    MainActivity-->registered User:Show
+    space
+    deactivate MainActivity
+    
+   
+
+	else User already registered
+    activate eMSP DBMS
+    eMSP DBMS-->CPMS_AuthorizationService:isNotRegistered
+	deactivate eMSP DBMS
+    activate CPMS_AuthorizationService
+    CPMS_AuthorizationService-->SigningActivity:Failed
+    deactivate CPMS_AuthorizationService
+    activate SigningActivity
+    SigningActivity-->registered User:Failed
+    space
+    deactivate SigningActivity
+    
+    
+	end
+else notValid
+
+activate SigningActivity
+SigningActivity-->registered User:Invalid data
+space 
+deactivate SigningActivity
+end 

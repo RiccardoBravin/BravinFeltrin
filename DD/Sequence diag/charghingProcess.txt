@@ -1,0 +1,104 @@
+title charging process
+
+actor eMSP user
+participant MainActivity
+participant chargingActivity
+participant appNotificationService
+participant eMSP_notificationService
+participant CPOs_API
+participant chargingCol_API
+participant switcher_API
+participant payment_API
+participant CPMS_chargingService
+database reservationDatabase
+
+
+eMSP user->MainActivity:clickChargeButton
+activate MainActivity
+MainActivity->chargingActivity:startChargingActivity
+deactivate MainActivity
+activate chargingActivity
+chargingActivity->chargingActivity:selectReservation
+alt NFC
+eMSP user->chargingActivity:nfcToken
+else manualToken
+eMSP user->chargingActivity:manualToken
+end
+chargingActivity->chargingActivity:parseToken
+alt validToken
+	activate CPOs_API
+	chargingActivity->CPOs_API:getCPMSreference	
+	CPOs_API-->chargingActivity:CPMSreference
+	deactivate CPOs_API
+	activate CPMS_chargingService
+ 	chargingActivity->CPMS_chargingService:checkReservation(user)
+    CPMS_chargingService->reservationDatabase:checkReservation(user)
+    activate reservationDatabase
+    alt validReservation
+    	linear 
+    	reservationDatabase-->CPMS_chargingService:OK
+        deactivate reservationDatabase
+        CPMS_chargingService-->chargingActivity:OK
+        chargingActivity-->eMSP user:startingChargeProecess
+        eMSP user->chargingCol_API:plugCar(socket)
+        activate chargingCol_API
+        chargingCol_API->CPMS_chargingService:carPlugged(chargeLevel, socket)	
+        CPMS_chargingService->CPMS_chargingService:choosePowerSource
+        activate CPMS_chargingService
+        space
+        deactivate CPMS_chargingService
+        CPMS_chargingService->switcher_API:startSupplying(column, socket, source)
+        activate switcher_API
+        switcher_API-->CPMS_chargingService:OK
+        deactivate switcher_API
+        CPMS_chargingService->>chargingCol_API:periodicLevelCheck
+        chargingCol_API-->CPMS_chargingService:chargingLevel
+        alt fullCharge or time-frame out
+        	CPMS_chargingService->switcher_API:stopSupplying(column, socket)
+        	activate switcher_API
+        	switcher_API-->CPMS_chargingService:OK
+        	deactivate switcher_API
+        	CPMS_chargingService->eMSP_notificationService:chargeOut
+        	activate eMSP_notificationService
+        	eMSP_notificationService-->CPMS_chargingService:received
+        	activate appNotificationService
+			appNotificationService->>eMSP_notificationService:periodicNotificationCheck
+	        eMSP_notificationService-->appNotificationService:chargeOut
+            space 
+            deactivate eMSP_notificationService
+    	    appNotificationService->eMSP user:chargeOut
+            space
+            deactivate appNotificationService
+        	eMSP user->chargingCol_API:unplugCar
+            chargingCol_API->CPMS_chargingService:carUnplugged
+            deactivate chargingCol_API
+            CPMS_chargingService->chargingActivity:totalBill
+            chargingActivity->payment_API:requestPayment(amount, beneficiary)
+            activate payment_API
+            payment_API-->chargingActivity:done
+			deactivate payment_API
+            chargingActivity-->eMSP user:paymentDone
+            chargingActivity-->CPMS_chargingService:paymentDone
+            deactivate CPMS_chargingService
+            deactivate chargingActivity
+            
+            
+	
+        end
+        
+        
+    else 
+    	activate chargingActivity 
+        activate reservationDatabase
+    	reservationDatabase-->CPMS_chargingService:fail
+        deactivate reservationDatabase
+        CPMS_chargingService-->chargingActivity:fail
+        chargingActivity-->eMSP user:fail
+        deactivate chargingActivity
+    end
+else invalidToken
+	activate chargingActivity 
+	chargingActivity-->eMSP user:tokenFail
+    deactivate chargingActivity
+end
+

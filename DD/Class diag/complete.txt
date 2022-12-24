@@ -3,6 +3,7 @@
 namespace eMSP_APP <<frame>>{
    	interface OS{
     	+ requestHandler(request)
+		+ start(Activity)
    	}
    
    	interface MainInterface{
@@ -30,9 +31,15 @@ namespace eMSP_APP <<frame>>{
 
 	}
 
-
-
+	OS<|..|>MainInterface
+	OS<|..|>ChargingInterface
+	OS<|..|>SigningInterface
+	OS<|..|>ReservationInterface
+	OS<|..|>NotificationInterface	
 }
+
+
+
 
 namespace eMSP_Server <<frame>>{
    	interface eMSP_API{
@@ -83,6 +90,18 @@ namespace CPMS_Server <<frame>>{
 
 	interface ChargingInterface
 }
+
+package Users_DBMS <<Database>>{
+	
+}
+
+package Reservations_DBMS <<Database>>{
+	
+}
+
+
+eMSP_APP.OS..|>eMSP_Server.eMSP_API
+eMSP_APP.OS..|>CPMS_Server.CPMS_API
 
 
 @enduml

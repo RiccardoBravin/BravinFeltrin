@@ -1,4 +1,4 @@
-title autonomous DSO change
+title autonomous energy management
 
 participant CPMS_PowerManagerService
 participant DSOs_API

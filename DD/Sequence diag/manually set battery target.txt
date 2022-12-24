@@ -1,0 +1,55 @@
+title Manually set battery target
+
+actor CPO Employee
+participant UserInterfaceManager
+participant PowerManagerService
+participant BatteryPack_API
+
+
+linear
+
+activate UserInterfaceManager
+activate BatteryPack_API
+
+	CPO Employee->UserInterfaceManager:select battery control 
+    
+    UserInterfaceManager -> PowerManagerService: requestBatteryInfo()
+    activate PowerManagerService
+    PowerManagerService->BatteryPack_API: requestInfo()
+    
+    BatteryPack_API-->PowerManagerService:BatteryInfo
+    PowerManagerService-->UserInterfaceManager: BatteryInfo
+    deactivate PowerManagerService
+    UserInterfaceManager-->CPO Employee:show Battery info 
+    
+    CPO Employee->UserInterfaceManager:select new battery target
+    UserInterfaceManager->PowerManagerService:newBatteryTarget(level)
+    activate PowerManagerService
+    
+    PowerManagerService->PowerManagerService:startBatteryMonitoring
+    activate PowerManagerService
+    
+    
+    
+    PowerManagerService-->UserInterfaceManager:NewTargetSet
+    UserInterfaceManager-->CPO Employee:new target set confirmation 
+    
+    loop periodic call
+    	PowerManagerService->BatteryPack_API: requestInfo()
+    
+    	BatteryPack_API-->PowerManagerService:BatteryInfo
+    
+    	alt Battery level > target
+        	PowerManagerService->BatteryPack_API:SetDischarge()
+        	BatteryPack_API-->PowerManagerService:OK
+        else Battery level > target
+        	PowerManagerService->BatteryPack_API:SetCharge()
+        	BatteryPack_API-->PowerManagerService:OK
+        end
+    end
+    
+deactivate PowerManagerService
+deactivate PowerManagerService
+deactivate BatteryPack_API
+    
+

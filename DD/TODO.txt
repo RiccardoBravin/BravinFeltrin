@@ -1,0 +1,4 @@
+finish DSO change manually and automatically
+add open app and login check to charging proces,...
+
+uniform functions names and actors

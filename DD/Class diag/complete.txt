@@ -1,0 +1,89 @@
+@startuml Complete diagram
+
+namespace eMSP_APP <<frame>>{
+   	interface OS{
+    	+ requestHandler(request)
+   	}
+   
+   	interface MainInterface{
+		
+	}	
+
+	interface ChargingInterface{
+
+
+	}
+
+	interface SigningInterface{
+
+	}
+
+	interface ReservationInterface{
+
+	}
+
+	interface ChargingInterface{
+
+	}
+
+	interface NotificationInterface{
+
+	}
+
+
+
+}
+
+namespace eMSP_Server <<frame>>{
+   	interface eMSP_API{
+		+ requestHandler(request)
+   	}
+   
+   	interface RegistrationInterface{
+   	
+	}	
+
+	interface NotificationInterface{
+
+	}
+}
+
+namespace CPMS_Server <<frame>>{
+   	interface CPMS_API{
+		+ requestHandler(request)
+   	}
+   
+   	interface PowerManagerInterface{
+   	
+	}	
+
+	interface ReservationInterface{
+
+	}
+
+	interface InfoInterface{
+
+	}
+
+	interface AuthorizationInterface{
+
+	}
+
+	interface ChargingColumn_API{
+
+	}
+
+	interface BatteryPack_API{
+
+	}	
+
+	interface Switcher_API{
+
+	}
+
+	interface ChargingInterface
+}
+
+
+@enduml
+

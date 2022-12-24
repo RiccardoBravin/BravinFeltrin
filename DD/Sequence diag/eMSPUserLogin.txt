@@ -4,7 +4,7 @@ actor registered User
 participant MainActivity
 participant SigningActivity
 participant eMSP_RegistrationService
-database eMSP DBMS
+database Users_DBMS
 
 
 activate MainActivity
@@ -37,14 +37,14 @@ alt isValid
 	SigningActivity->eMSP_RegistrationService:Login(Data)
 	
 	activate eMSP_RegistrationService
-	eMSP_RegistrationService->eMSP DBMS:checkUser(Data)
-	activate eMSP DBMS
+	eMSP_RegistrationService->Users_DBMS:checkUser(Data)
+	activate Users_DBMS
 
 
 	alt isRegistered
 
-	eMSP DBMS-->eMSP_RegistrationService:isRegistered
-    deactivate eMSP DBMS
+	Users_DBMS-->eMSP_RegistrationService:isRegistered
+    deactivate Users_DBMS
     eMSP_RegistrationService-->SigningActivity:OK
     deactivate eMSP_RegistrationService
     SigningActivity-->registered User:Successfull login
@@ -59,9 +59,9 @@ alt isValid
    
 
 	else User already registered
-    activate eMSP DBMS
-    eMSP DBMS-->eMSP_RegistrationService:isNotRegistered
-	deactivate eMSP DBMS
+    activate Users_DBMS
+    Users_DBMS-->eMSP_RegistrationService:isNotRegistered
+	deactivate Users_DBMS
     activate eMSP_RegistrationService
     eMSP_RegistrationService-->SigningActivity:Failed
     deactivate eMSP_RegistrationService

@@ -1,25 +1,37 @@
 @startuml Complete diagram
 
 namespace eMSP_APP <<frame>>{
-   	interface OS{
+   	interface OSInterface{
     	+ requestHandler(request)
 		+ start(Activity)
    	}
    
    	interface MainInterface{
-		
+		+ ChargeButtonPressed()
+		+ ChargingStationSelected(CS)
+		+ BookForChargeButtonPressed()
+		- isLogged()
+		- updatePosition(search_string)
+		- LocateUser()
+		- insertMapMarkers(CS)
 	}	
 
 	interface ChargingInterface{
-
+		+ CommittToken()
+		- ParseToken()
 	}
 
 	interface SigningInterface{
-
+		+ LoginButtonPressed()
+		+ LoginForm(user,pass)
+		+ RegisterButtonPressed()
+		+ RegisterForm(data)
+		- validateInput(data)
 	}
 
 	interface ReservationInterface{
-
+		+ ReservationForm(reservation)
+		- validateInput(data)
 	}
 
 	interface ChargingInterface{
@@ -27,14 +39,14 @@ namespace eMSP_APP <<frame>>{
 	}
 
 	interface NotificationInterface{
-
+		 
 	}
 
-	OS<|..|>MainInterface
-	OS<|..|>ChargingInterface
-	OS<|..|>SigningInterface
-	OS<|..|>ReservationInterface
-	OS<|..|>NotificationInterface	
+	OSInterface<|..|>MainInterface
+	OSInterface<|..|>ChargingInterface
+	OSInterface<|..|>SigningInterface
+	OSInterface<|..|>ReservationInterface
+	OSInterface<|..NotificationInterface	
 }
 
 
@@ -46,16 +58,24 @@ namespace eMSP_Server <<frame>>{
    	}
    
    	interface RegistrationInterface{
-   	
+		+ login(user, pass)
+		+ register(data)
+		+ verifyMail(mail)
 	}	
 
 	interface NotificationInterface{
-
+		+ missedRservation(reservation)
 	}
+
+	
+
+	eMSP_API..|>RegistrationInterface
+	eMSP_API..|>NotificationInterface
 }
 
 namespace CPMS_Server <<frame>>{
    	interface CPMS_API{
+		+ requestSender(request)
 		+ requestHandler(request)
    	}
    
@@ -64,10 +84,11 @@ namespace CPMS_Server <<frame>>{
 	}	
 
 	interface ReservationInterface{
-
+		+ RequestReservation(reservation)
 	}
 
 	interface InfoInterface{
+		+ getInfo()
 
 	}
 
@@ -87,20 +108,66 @@ namespace CPMS_Server <<frame>>{
 
 	}
 
-	interface ChargingInterface
+	interface ChargingInterface{
+
+	}
+
+	CPMS_API..|>PowerManagerInterface
+	CPMS_API..|>ReservationInterface
+	CPMS_API..|>InfoInterface
+	CPMS_API..|>AuthorizationInterface
+	CPMS_API..|>ChargingInterface
+
+	InfoInterface..|>ChargingColumn_API
+	InfoInterface..|>BatteryPack_API
+	InfoInterface..|>Switcher_API
+
+	ChargingInterface..|>ChargingColumn_API
+	ChargingInterface..|>Switcher_API
+
+	Switcher_API..|>ChargingColumn_API
+
+
+
 }
 
 package Users_DBMS <<Database>>{
-	
-}
+		interface Users_DBMS_API{
+			+ find(name,pass)
+			+ insert(User)
+			+ update(User)
+		}
+	}
+
 
 package Reservations_DBMS <<Database>>{
-	
+	interface Reservations_DBMS_API{
+		+ find(reservation)
+		+ insert(reservation)
+		+ remove(reservation)
+	}
+}
+
+interface CPOs_API{
+	+ GetCPMSs() 
+	+ verifyUserCredentials(user, pass)
+}
+
+interface Payment_API{
+	+ pay(info,bill)
+	+ verifyPaymentMethod()
 }
 
 
-eMSP_APP.OS..|>eMSP_Server.eMSP_API
-eMSP_APP.OS..|>CPMS_Server.CPMS_API
+eMSP_APP.OSInterface..|>eMSP_Server.eMSP_API
+eMSP_APP.OSInterface..|>CPMS_Server.CPMS_API
+eMSP_APP.OSInterface..|>CPOs_API
+eMSP_APP.OSInterface..|>Payment_API
+
+CPMS_Server.ReservationInterface..|>Reservations_DBMS
+
+eMSP_Server.RegistrationInterface..|>Users_DBMS
+
 
 
 @enduml

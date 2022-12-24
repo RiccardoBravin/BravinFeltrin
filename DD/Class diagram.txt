@@ -11,7 +11,6 @@ namespace eMSP_APP <<frame>>{
 
 	interface ChargingInterface{
 
-
 	}
 
 	interface SigningInterface{
@@ -29,8 +28,6 @@ namespace eMSP_APP <<frame>>{
 	interface NotificationInterface{
 
 	}
-
-
 
 }
 

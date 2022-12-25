@@ -85,10 +85,15 @@ alt validToken
     	    appNotificationService->eMSP user:chargeOut
             space
             deactivate appNotificationService
+            
         	eMSP user->Charging column:unplugCar
             Charging column->CPMS_chargingService:carUnplugged
+            #COlumn api non fa richiesta diretta a cpms ma dopo aver fermato la ricarica questo aspetta che l'user disconnetta il plug, poi prepara il conto
             deactivate Charging column
             CPMS_chargingService->chargingActivity:totalBill
+            #CPMS CANNOT MAKE REQUEST DIRECTLY TO APP
+            # puoi fare che dopo essere stato avvisato che il tempo è scaduto chiede per il totale 
+            #che poi in realtà NON ci tenevamo direttamente il max prima della prenotazione e poi andavamo a rimborsare il rimanente??
             chargingActivity->payment_API:requestPayment(amount, beneficiary)
             activate payment_API
             payment_API-->chargingActivity:done

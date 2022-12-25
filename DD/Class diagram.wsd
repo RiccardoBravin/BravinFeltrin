@@ -4,6 +4,7 @@ namespace eMSP_APP <<frame>>{
    	interface OSInterface{
     	+ requestHandler(request)
 		+ start(Activity)
+		+ notify(msg)
    	}
    
    	interface MainInterface{
@@ -19,6 +20,7 @@ namespace eMSP_APP <<frame>>{
 	interface ChargingInterface{
 		+ committToken()
 		- parseToken()
+		- prepareBill()
 	}
 
 	interface SigningInterface{
@@ -60,7 +62,9 @@ namespace eMSP_Server <<frame>>{
 	}	
 
 	interface NotificationInterface{
-		+ missedRservation(reservation)
+		+ missedRservation(user)
+		+ chargeCompleted(user)
+		+ getNotifications(user)
 	}
 
 	
@@ -90,6 +94,7 @@ namespace CPMS_Server <<frame>>{
 		+ getDSOs()
 		+ filterDSOs(filter)
 		+ requestDSOChange(DSO)
+		+ selectBestDSO()		
 		- applyFilter(list, filter)
 
 	}	
@@ -108,37 +113,22 @@ namespace CPMS_Server <<frame>>{
 		- verifyInput(user,psw)
 	}
 
-	interface ChargingColumn_API{
-
-	}
-
-	interface BatteryPack_API{
-
-	}	
-
-	interface Switcher_API{
-
-	}
+	
 
 	interface ChargingInterface{
-
+		+ checkReservation(token)
 	}
 
-	CPMS_API..|>PowerManagerInterface
+	
 	CPMS_API..|>ReservationInterface
 	CPMS_API..|>InfoInterface
 	CPMS_API..|>AuthorizationInterface
 	CPMS_API..|>ChargingInterface
 	CPMS_API..|>GraphicsInterface
 
-	InfoInterface..|>ChargingColumn_API
-	InfoInterface..|>BatteryPack_API
-	InfoInterface..|>Switcher_API
+	GraphicsInterface..|>PowerManagerInterface
 
-	ChargingInterface..|>ChargingColumn_API
-	ChargingInterface..|>Switcher_API
 
-	Switcher_API..|>ChargingColumn_API
 
 
 
@@ -176,15 +166,47 @@ interface Payment_API{
 	+ verifyPaymentMethod()
 }
 
+interface ChargingColumn_API{
+	+ getFreeSockets()
+	+ getChargingStatus(socket)
+	+ isSocketUnplugged(socket)
+}
+
+interface BatteryPack_API{
+	+ getLevel()
+	+ getEnergyValue()
+	+ fillBattery()
+}	
+
+interface Switcher_API{
+	+ startBatterySupply()
+	+ startDSOSupply()
+}
+
 
 eMSP_APP.OSInterface..|>eMSP_Server.eMSP_API
 eMSP_APP.OSInterface..|>CPMS_Server.CPMS_API
 eMSP_APP.OSInterface..|>CPOs_API
 eMSP_APP.OSInterface..|>Payment_API
 
-CPMS_Server.ReservationInterface..|>Reservations_DBMS
 
-eMSP_Server.RegistrationInterface..|>Users_DBMS
+eMSP_Server.RegistrationInterface..|>Users_DBMS_API
+
+CPMS_Server.CPMS_API..|>eMSP_Server.eMSP_API
+
+CPMS_Server.InfoInterface..|>Reservations_DBMS_API
+
+CPMS_Server.PowerManagerInterface..|>ChargingColumn_API
+CPMS_Server.PowerManagerInterface..|>BatteryPack_API
+CPMS_Server.PowerManagerInterface..|>Switcher_API
+CPMS_Server.PowerManagerInterface..|>DSOs_API
+
+CPMS_Server.ChargingInterface..|>ChargingColumn_API
+CPMS_Server.ChargingInterface..|>Switcher_API
+CPMS_Server.ChargingInterface..|>Reservations_DBMS_API
+
+CPMS_Server.ReservationInterface..|>Reservations_DBMS_API
+
 
 
 

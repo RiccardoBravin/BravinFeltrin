@@ -7,39 +7,35 @@ namespace eMSP_APP <<frame>>{
    	}
    
    	interface MainInterface{
-		+ ChargeButtonPressed()
-		+ ChargingStationSelected(CS)
-		+ BookForChargeButtonPressed()
+		+ chargeButtonPressed()
+		+ chargingStationSelected(CS)
+		+ bookForChargeButtonPressed()
 		- isLogged()
 		- updatePosition(search_string)
-		- LocateUser()
+		- locateUser()
 		- insertMapMarkers(CS)
 	}	
 
 	interface ChargingInterface{
-		+ CommittToken()
-		- ParseToken()
+		+ committToken()
+		- parseToken()
 	}
 
 	interface SigningInterface{
-		+ LoginButtonPressed()
-		+ LoginForm(user,pass)
-		+ RegisterButtonPressed()
-		+ RegisterForm(data)
+		+ loginButtonPressed()
+		+ loginForm(user,psw)
+		+ registerButtonPressed()
+		+ registerForm(data)
 		- validateInput(data)
 	}
 
 	interface ReservationInterface{
-		+ ReservationForm(reservation)
+		+ reservationForm(reservation)
 		- validateInput(data)
 	}
 
-	interface ChargingInterface{
-
-	}
-
 	interface NotificationInterface{
-		 
+		+ serviceStartup()
 	}
 
 	OSInterface<|..|>MainInterface
@@ -58,7 +54,7 @@ namespace eMSP_Server <<frame>>{
    	}
    
    	interface RegistrationInterface{
-		+ login(user, pass)
+		+ login(user, psw)
 		+ register(data)
 		+ verifyMail(mail)
 	}	
@@ -73,18 +69,33 @@ namespace eMSP_Server <<frame>>{
 	eMSP_API..|>NotificationInterface
 }
 
+
+
 namespace CPMS_Server <<frame>>{
    	interface CPMS_API{
 		+ requestSender(request)
 		+ requestHandler(request)
    	}
+
+	interface GraphicsInterface{
+		+ changeDSOSelected()
+		+ showDSOList()
+		+ filterDSOs(filter)
+		+ changeDSO(form)
+		+ loginForm(user,psw)
+
+	}
    
    	interface PowerManagerInterface{
-   	
+		+ getDSOs()
+		+ filterDSOs(filter)
+		+ requestDSOChange(DSO)
+		- applyFilter(list, filter)
+
 	}	
 
 	interface ReservationInterface{
-		+ RequestReservation(reservation)
+		+ requestReservation(reservation)
 	}
 
 	interface InfoInterface{
@@ -93,7 +104,8 @@ namespace CPMS_Server <<frame>>{
 	}
 
 	interface AuthorizationInterface{
-
+		+ login(user,psw)
+		- verifyInput(user,psw)
 	}
 
 	interface ChargingColumn_API{
@@ -117,6 +129,7 @@ namespace CPMS_Server <<frame>>{
 	CPMS_API..|>InfoInterface
 	CPMS_API..|>AuthorizationInterface
 	CPMS_API..|>ChargingInterface
+	CPMS_API..|>GraphicsInterface
 
 	InfoInterface..|>ChargingColumn_API
 	InfoInterface..|>BatteryPack_API
@@ -133,7 +146,7 @@ namespace CPMS_Server <<frame>>{
 
 package Users_DBMS <<Database>>{
 		interface Users_DBMS_API{
-			+ find(name,pass)
+			+ find(name,psw)
 			+ insert(User)
 			+ update(User)
 		}
@@ -149,8 +162,13 @@ package Reservations_DBMS <<Database>>{
 }
 
 interface CPOs_API{
-	+ GetCPMSs() 
-	+ verifyUserCredentials(user, pass)
+	+ getCPMSs() 
+	+ verifyUserCredentials(user, psw)
+}
+
+interface DSOs_API{
+	+ getDSOs()
+	+ stipulateContract(DSO)
 }
 
 interface Payment_API{
@@ -167,6 +185,7 @@ eMSP_APP.OSInterface..|>Payment_API
 CPMS_Server.ReservationInterface..|>Reservations_DBMS
 
 eMSP_Server.RegistrationInterface..|>Users_DBMS
+
 
 
 

@@ -1,28 +1,50 @@
 title CPMS employee login
 
 actor CPMS employee
-participant CPMS_loginUI
+participant UserInterfaceManager
+participant AuthorizationService
 participant CPO_API
-participant CPMS_loginUI
-participant CPMS employee
-CPMS employee->CPMS_loginUI:login(data)
-activate CPMS_loginUI
-CPMS_loginUI->CPMS_loginUI:ValidateInput()
-alt isValid
-CPMS_loginUI->CPO_API:checkEmployee(data)
+
+
+activate UserInterfaceManager
+CPMS employee->UserInterfaceManager:fill login form
+
+	
+UserInterfaceManager-> AuthorizationService: Login(user,psw)
+activate AuthorizationService
+AuthorizationService->AuthorizationService:ValidateInput()
+
+alt valid data
+
+    
+
+	
+    
+    AuthorizationService->CPO_API:verifyLogin(user,psw)
 	activate CPO_API
-	alt validEmployee
-    CPO_API-->CPMS_loginUI:validEmployee
+	alt employee authorized
+    
+    CPO_API-->AuthorizationService:Authorized
     deactivate CPO_API
-    CPMS_loginUI-->CPMS employee:Successfull login
-    else User already registered
+    AuthorizationService--> UserInterfaceManager: Authorized
+    deactivate AuthorizationService
+    
+    UserInterfaceManager-->CPMS employee:Successfull login
+    else employee not authorized
+    activate AuthorizationService
  	activate CPO_API
-    CPO_API-->CPMS_loginUI:invalidEmployee
+    
+    CPO_API-->AuthorizationService:Unauthorized
+    
     deactivate CPO_API
-    CPMS_loginUI-->CPMS employee:Failed
+    AuthorizationService--> UserInterfaceManager: Unauthorized
+    deactivate AuthorizationService
+    UserInterfaceManager-->CPMS employee:Failed
     space
 end
-else notValid
-CPMS_loginUI-->CPMS employee:Invalid data
-space 
+else invalid data
+	activate AuthorizationService
+    AuthorizationService-->UserInterfaceManager:Invalid data
+	UserInterfaceManager-->CPMS employee:Invalid data
+
 end 

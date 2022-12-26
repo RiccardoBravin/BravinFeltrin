@@ -5,7 +5,6 @@ participant MainActivity
 participant chargingActivity
 participant appNotificationService
 participant eMSP_notificationService
-participant CPOs_API
 participant Charging column
 participant Switcher
 participant payment_API
@@ -28,10 +27,6 @@ end
 chargingActivity->chargingActivity:parseToken
 
 alt validToken
-	activate CPOs_API
-	chargingActivity->CPOs_API:getCPMSreference	
-	CPOs_API-->chargingActivity:CPMSreference
-	deactivate CPOs_API
 	activate CPMS_chargingService
  	chargingActivity->CPMS_chargingService:checkReservation(user)
     CPMS_chargingService->Reservations DBMS:find(query)
@@ -42,9 +37,12 @@ alt validToken
         deactivate Reservations DBMS
         CPMS_chargingService-->chargingActivity:OK
         chargingActivity-->eMSP user:startingChargeProecess
+        CPMS_chargingService->Charging column:isPlugged
+                activate Charging column
         eMSP user->Charging column:plugCar(socket)
-        activate Charging column
-        Charging column->CPMS_chargingService:carPlugged(chargeLevel, socket)	
+		linear off
+        Charging column-->>CPMS_chargingService:carPlugged(chargeLevel, socket)	
+        linear on
 		CPMS_chargingService->Battery pack:getStoredPrice
 		activate Battery pack
 		Battery pack-->CPMS_chargingService:storedPrice
@@ -65,10 +63,10 @@ alt validToken
         activate CPMS_chargingService
         space
         deactivate CPMS_chargingService
-        
-        CPMS_chargingService->>Charging column:periodicLevelCheck
+        loop until full charge or timeout
+        CPMS_chargingService->>Charging column:levelCheck
         Charging column-->CPMS_chargingService:chargingLevel
-        
+        end
         alt fullCharge or time-frame out
         	CPMS_chargingService->Switcher:stopSupplying(column, socket)
         	activate Switcher

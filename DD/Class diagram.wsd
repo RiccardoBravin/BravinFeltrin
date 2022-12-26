@@ -8,6 +8,8 @@ namespace eMSP_APP <<frame>>{
    	}
    
    	interface MainInterface{
+		+ searchComitted(search_string)
+		+ bookNowButtonPressed()
 		+ chargeButtonPressed()
 		+ chargingStationSelected(CS)
 		+ bookForChargeButtonPressed()
@@ -34,6 +36,7 @@ namespace eMSP_APP <<frame>>{
 	interface ReservationInterface{
 		+ reservationForm(reservation)
 		- validateInput(data)
+		- calculateFee()
 	}
 
 	interface NotificationInterface{
@@ -87,6 +90,7 @@ namespace CPMS_Server <<frame>>{
 		+ filterDSOs(filter)
 		+ changeDSO(form)
 		+ loginForm(user,psw)
+		+ batteryTarget(val)
 
 	}
    
@@ -95,12 +99,16 @@ namespace CPMS_Server <<frame>>{
 		+ filterDSOs(filter)
 		+ requestDSOChange(DSO)
 		+ selectBestDSO()		
+		+ getBatteryInfo()
+		+ setBatteryTarget(val)
 		- applyFilter(list, filter)
+		- batteryMonitoring()
 
 	}	
 
 	interface ReservationInterface{
 		+ requestReservation(reservation)
+		+ cancelReservation(reservation)
 	}
 
 	interface InfoInterface{
@@ -127,7 +135,7 @@ namespace CPMS_Server <<frame>>{
 	CPMS_API..|>GraphicsInterface
 
 	GraphicsInterface..|>PowerManagerInterface
-
+	GraphicsInterface..|>AuthorizationInterface
 
 
 
@@ -176,6 +184,8 @@ interface BatteryPack_API{
 	+ getLevel()
 	+ getEnergyValue()
 	+ fillBattery()
+	+ setDischarge()
+	+ setCharge()
 }	
 
 interface Switcher_API{
@@ -206,6 +216,8 @@ CPMS_Server.ChargingInterface..|>Switcher_API
 CPMS_Server.ChargingInterface..|>Reservations_DBMS_API
 
 CPMS_Server.ReservationInterface..|>Reservations_DBMS_API
+
+CPMS_Server.AuthorizationInterface..|>CPOs_API
 
 
 

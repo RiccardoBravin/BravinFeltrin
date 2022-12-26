@@ -132,7 +132,7 @@ namespace CPMS_Server <<frame>>{
 	CPMS_API..|>InfoInterface
 	CPMS_API..|>AuthorizationInterface
 	CPMS_API..|>ChargingInterface
-	CPMS_API..|>GraphicsInterface
+	
 
 	GraphicsInterface..|>PowerManagerInterface
 	GraphicsInterface..|>AuthorizationInterface

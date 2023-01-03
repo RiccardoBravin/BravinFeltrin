@@ -10,7 +10,7 @@ participant Switcher_API
 participant payment_API
 participant CPMS_chargingService
 participant BatteryPack_API
-database Reservations_DBMS_API
+participant Reservations_DBMS_API
 
 
 eMSP user->appMainActivity:clickChargeButton

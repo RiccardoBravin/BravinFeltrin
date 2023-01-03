@@ -4,7 +4,7 @@ actor registered User
 participant appMainActivity
 participant appSigningActivity
 participant eMSP_registrationService
-database user_DBMS_API
+participant user_DBMS_API
 
 
 activate appMainActivity

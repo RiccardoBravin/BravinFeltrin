@@ -7,7 +7,7 @@ participant CPMS_InfoService
 participant appReservationActivity
 participant CPMS_ReservationService
 
-database reservation_DBMS_API
+participant reservation_DBMS_API
 participant Payment_API
 
 activate appMainActivity

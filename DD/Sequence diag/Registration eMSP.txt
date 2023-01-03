@@ -4,7 +4,7 @@ actor Unregistered User
 participant appMainActivity
 participant appSigningActivity
 participant eMSP_registrationService
-database Users DBMS
+partecipant Users DBMS
 participant payment_API
 
 

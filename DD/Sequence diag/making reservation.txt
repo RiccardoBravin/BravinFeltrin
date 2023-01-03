@@ -1,127 +1,127 @@
 title Making a reservation
 
 actor Registered User
-participant MainActivity
-participant CPO_API
+participant appMainActivity
+participant CPOs_API
 participant CPMS_InfoService
-participant ReservationActivity
+participant appReservationActivity
 participant CPMS_ReservationService
 
-database Reservations_Database
-participant PaymentAPI
+database reservation_DBMS_API
+participant Payment_API
 
-activate MainActivity
+activate appMainActivity
 
-Registered User->MainActivity:Open APP
+Registered User->appMainActivity:Open APP
 
-MainActivity->MainActivity:isLogged()
+appMainActivity->appMainActivity:isLogged()
 
-activate MainActivity
+activate appMainActivity
 space
-deactivate MainActivity
+deactivate appMainActivity
 
-MainActivity-->Registered User: ShowMap
+appMainActivity-->Registered User: ShowMap
 
 alt User wants to define search location
-	Registered User->MainActivity:Search string
-    MainActivity->MainActivity:UpdatePosition(search_string)
+	Registered User->appMainActivity:Search string
+    appMainActivity->appMainActivity:UpdatePosition(search_string)
     
 else Book NOW option
-	Registered User->MainActivity:Select Book NOW
-	MainActivity->MainActivity:LocateUser()
+	Registered User->appMainActivity:Select Book NOW
+	appMainActivity->appMainActivity:LocateUser()
 	
 end
 
-MainActivity->CPO_API:RequestCS(loc)
-activate CPO_API
+appMainActivity->CPOs_API:RequestCS(loc)
+activate CPOs_API
 
 
 
-CPO_API-->MainActivity:CSList
-deactivate CPO_API
+CPOs_API-->appMainActivity:CSList
+deactivate CPOs_API
 
 space
 
-activate MainActivity
+activate appMainActivity
 loop for each CS in list
-MainActivity->CPMS_InfoService:RequestInfo()
+appMainActivity->CPMS_InfoService:RequestInfo()
 activate CPMS_InfoService
 alt Response from CPMS received
-CPMS_InfoService -->MainActivity:CSInfo
+CPMS_InfoService -->appMainActivity:CSInfo
 
-MainActivity->MainActivity:InsertCSMarkers(cs)
+appMainActivity->appMainActivity:InsertCSMarkers(cs)
 end
 
 deactivate CPMS_InfoService
 end
-deactivate MainActivity
+deactivate appMainActivity
 
 
-MainActivity-->Registered User:ShowUpdatedMap
+appMainActivity-->Registered User:ShowUpdatedMap
 
-Registered User->MainActivity:Select CS
-MainActivity-->Registered User:Show CS info
+Registered User->appMainActivity:Select CS
+appMainActivity-->Registered User:Show CS info
 
-Registered User->MainActivity:Click "Book for charge"
-MainActivity->ReservationActivity:StartReservationActivity
-activate ReservationActivity
-deactivate MainActivity
+Registered User->appMainActivity:Click "Book for charge"
+appMainActivity->appReservationActivity:StartReservationActivity
+activate appReservationActivity
+deactivate appMainActivity
 
-ReservationActivity-->Registered User:Show reservation form
-Registered User->ReservationActivity:Fill form data
+appReservationActivity-->Registered User:Show reservation form
+Registered User->appReservationActivity:Fill form data
 
-ReservationActivity->ReservationActivity:ValidateInput()
+appReservationActivity->appReservationActivity:ValidateInput()
 
-ReservationActivity->CPMS_ReservationService: RequestReservation(date,info)
+appReservationActivity->CPMS_ReservationService: RequestReservation(date,info)
 activate CPMS_ReservationService
 
-CPMS_ReservationService->Reservations_Database:insert(reservation)
-activate Reservations_Database
+CPMS_ReservationService->reservation_DBMS_API:insert(reservation)
+activate reservation_DBMS_API
 alt correctly inserted
 
-	Reservations_Database-->CPMS_ReservationService: InsertionPerformed
-    deactivate Reservations_Database
-    CPMS_ReservationService-->ReservationActivity: ReservationGranted
+	reservation_DBMS_API-->CPMS_ReservationService: InsertionPerformed
+    deactivate reservation_DBMS_API
+    CPMS_ReservationService-->appReservationActivity: ReservationGranted
     deactivate CPMS_ReservationService
-    ReservationActivity->ReservationActivity:CalculateFee
+    appReservationActivity->appReservationActivity:CalculateFee
     
-    ReservationActivity->PaymentAPI:RequestPayment
-    activate PaymentAPI
+    appReservationActivity->Payment_API:RequestPayment
+    activate Payment_API
     
     alt Payment Completed
-    	PaymentAPI-->ReservationActivity:Payment Confirmed
-        deactivate PaymentAPI
-        ReservationActivity-->Registered User: Show reservation success
-        ReservationActivity->MainActivity:StartMainActivity
-        deactivate ReservationActivity
-        activate MainActivity
-        MainActivity-->Registered User: Show main page
+    	Payment_API-->appReservationActivity:Payment Confirmed
+        deactivate Payment_API
+        appReservationActivity-->Registered User: Show reservation success
+        appReservationActivity->appMainActivity:StartMainActivity
+        deactivate appReservationActivity
+        activate appMainActivity
+        appMainActivity-->Registered User: Show main page
         space 
-        deactivate MainActivity
+        deactivate appMainActivity
     else Payment rejected
-    	activate PaymentAPI
-        activate ReservationActivity
-        PaymentAPI-->ReservationActivity:Payment rejected
-        deactivate PaymentAPI
-        ReservationActivity->Reservations_Database:remove(res)
-        activate Reservations_Database
-        Reservations_Database-->ReservationActivity:Confirmation
-        deactivate Reservations_Database
-        ReservationActivity-->Registered User:Notify Reservation Failed (payment rejected)
+    	activate Payment_API
+        activate appReservationActivity
+        Payment_API-->appReservationActivity:Payment rejected
+        deactivate Payment_API
+        appReservationActivity->reservation_DBMS_API:remove(res)
+        activate reservation_DBMS_API
+        reservation_DBMS_API-->appReservationActivity:Confirmation
+        deactivate reservation_DBMS_API
+        appReservationActivity-->Registered User:Notify Reservation Failed (payment rejected)
     	space
-        deactivate ReservationActivity
+        deactivate appReservationActivity
         
     end
 	
 else Timeframe not available
-	activate Reservations_Database
+	activate reservation_DBMS_API
     activate CPMS_ReservationService
-    activate ReservationActivity
-    Reservations_Database-->CPMS_ReservationService: Reservation rejected
-    deactivate Reservations_Database
-    CPMS_ReservationService-->ReservationActivity: Reservation rejected
+    activate appReservationActivity
+    reservation_DBMS_API-->CPMS_ReservationService: Reservation rejected
+    deactivate reservation_DBMS_API
+    CPMS_ReservationService-->appReservationActivity: Reservation rejected
     deactivate CPMS_ReservationService
-    ReservationActivity-->Registered User:Notify Reservation Failed (Reservation rejected)
+    appReservationActivity-->Registered User:Notify Reservation Failed (Reservation rejected)
     
 end
 

@@ -1,18 +1,18 @@
 title CPMS employee login
 
 actor CPMS employee
-participant UserInterfaceManager
-participant AuthorizationService
-participant CPO_API
+participant CPMS_graphics
+participant CPMS_authorizationService
+participant CPOs_API
 
 
-activate UserInterfaceManager
-CPMS employee->UserInterfaceManager:fill login form
+activate CPMS_graphics
+CPMS employee->CPMS_graphics:fill login form
 
 	
-UserInterfaceManager-> AuthorizationService: Login(user,psw)
-activate AuthorizationService
-AuthorizationService->AuthorizationService:ValidateInput()
+CPMS_graphics-> CPMS_authorizationService: Login(user,psw)
+activate CPMS_authorizationService
+CPMS_authorizationService->CPMS_authorizationService:ValidateInput()
 
 alt valid data
 
@@ -20,31 +20,31 @@ alt valid data
 
 	
     
-    AuthorizationService->CPO_API:verifyLogin(user,psw)
-	activate CPO_API
+    CPMS_authorizationService->CPOs_API:verifyLogin(user,psw)
+	activate CPOs_API
 	alt employee authorized
     
-    CPO_API-->AuthorizationService:Authorized
-    deactivate CPO_API
-    AuthorizationService--> UserInterfaceManager: Authorized
-    deactivate AuthorizationService
+    CPOs_API-->CPMS_authorizationService:Authorized
+    deactivate CPOs_API
+    CPMS_authorizationService--> CPMS_graphics: Authorized
+    deactivate CPMS_authorizationService
     
-    UserInterfaceManager-->CPMS employee:Successfull login
+    CPMS_graphics-->CPMS employee:Successfull login
     else employee not authorized
-    activate AuthorizationService
- 	activate CPO_API
+    activate CPMS_authorizationService
+ 	activate CPOs_API
     
-    CPO_API-->AuthorizationService:Unauthorized
+    CPOs_API-->CPMS_authorizationService:Unauthorized
     
-    deactivate CPO_API
-    AuthorizationService--> UserInterfaceManager: Unauthorized
-    deactivate AuthorizationService
-    UserInterfaceManager-->CPMS employee:Failed
+    deactivate CPOs_API
+    CPMS_authorizationService--> CPMS_graphics: Unauthorized
+    deactivate CPMS_authorizationService
+    CPMS_graphics-->CPMS employee:Failed
     space
 end
 else invalid data
-	activate AuthorizationService
-    AuthorizationService-->UserInterfaceManager:Invalid data
-	UserInterfaceManager-->CPMS employee:Invalid data
+	activate CPMS_authorizationService
+    CPMS_authorizationService-->CPMS_graphics:Invalid data
+	CPMS_graphics-->CPMS employee:Invalid data
 
 end 

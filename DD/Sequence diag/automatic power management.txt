@@ -1,37 +1,37 @@
 title autonomous energy management
 
-participant CPMS_PowerManagerService
+participant CPMS_powerManagerService
 participant DSOs_API
-participant batteryPack_API
+participant BatteryPack_API
 
-activate CPMS_PowerManagerService
-CPMS_PowerManagerService->>DSOs_API:periodicCostCheck
+activate CPMS_powerManagerService
+CPMS_powerManagerService->>DSOs_API:periodicCostCheck
 activate DSOs_API
-DSOs_API-->CPMS_PowerManagerService:prices
+DSOs_API-->CPMS_powerManagerService:prices
 deactivate DSOs_API
 alt new prices better than old ones 
-	CPMS_PowerManagerService->CPMS_PowerManagerService:selectBetterOne
-	CPMS_PowerManagerService->DSOs_API:stipulateNewContract
+	CPMS_powerManagerService->CPMS_powerManagerService:selectBetterOne
+	CPMS_powerManagerService->DSOs_API:stipulateNewContract
     activate DSOs_API
-	DSOs_API-->CPMS_PowerManagerService:done
+	DSOs_API-->CPMS_powerManagerService:done
     deactivate DSOs_API
 end
 
-CPMS_PowerManagerService->batteryPack_API:getBatteryLevel
-activate batteryPack_API
-batteryPack_API-->CPMS_PowerManagerService:batteryLevel
+CPMS_powerManagerService->BatteryPack_API:getBatteryLevel
+activate BatteryPack_API
+BatteryPack_API-->CPMS_powerManagerService:batteryLevel
 alt Not full
-	CPMS_PowerManagerService->batteryPack_API:getStoredEnergyPrice
-	batteryPack_API-->CPMS_PowerManagerService:storedEnergyPrice
-    deactivate batteryPack_API
+	CPMS_powerManagerService->BatteryPack_API:getStoredEnergyPrice
+	BatteryPack_API-->CPMS_powerManagerService:storedEnergyPrice
+    deactivate BatteryPack_API
     
     alt Current price lower than stored one or is night time
-        CPMS_PowerManagerService->batteryPack_API:fillBatteries
-        activate batteryPack_API 
-        #batteryPack_API-->CPMS_PowerManagerService:processStart
+        CPMS_powerManagerService->BatteryPack_API:fillBatteries
+        activate BatteryPack_API 
+        #BatteryPack_API-->CPMS_powerManagerService:processStart
         space
         space
-        batteryPack_API-->CPMS_PowerManagerService:processEnd
-        deactivate batteryPack_API
+        BatteryPack_API-->CPMS_powerManagerService:processEnd
+        deactivate BatteryPack_API
     end    
 end

@@ -1,81 +1,81 @@
 title eMSP user login
 
 actor registered User
-participant MainActivity
-participant SigningActivity
-participant eMSP_RegistrationService
-database Users_DBMS
+participant appMainActivity
+participant appSigningActivity
+participant eMSP_registrationService
+database user_DBMS_API
 
 
-activate MainActivity
+activate appMainActivity
 
-registered User->MainActivity:Open APP
+registered User->appMainActivity:Open APP
 
-MainActivity->MainActivity:isLogged()
+appMainActivity->appMainActivity:isLogged()
 
-activate MainActivity
-MainActivity->>SigningActivity:StartSigningActivity
-deactivate MainActivity
-deactivate MainActivity
+activate appMainActivity
+appMainActivity->>appSigningActivity:StartSigningActivity
+deactivate appMainActivity
+deactivate appMainActivity
 
-activate SigningActivity
-SigningActivity-->registered User: ShowInterface
-
-
-
-registered User->SigningActivity:Click login button
-
-registered User<--SigningActivity:ShowLoginForm
+activate appSigningActivity
+appSigningActivity-->registered User: ShowInterface
 
 
-registered User->SigningActivity:Submit data
 
-SigningActivity->SigningActivity:ValidateInput()
+registered User->appSigningActivity:Click login button
+
+registered User<--appSigningActivity:ShowLoginForm
+
+
+registered User->appSigningActivity:Submit data
+
+appSigningActivity->appSigningActivity:ValidateInput()
 
 alt isValid
 
-	SigningActivity->eMSP_RegistrationService:Login(Data)
+	appSigningActivity->eMSP_registrationService:Login(Data)
 	
-	activate eMSP_RegistrationService
-	eMSP_RegistrationService->Users_DBMS:checkUser(Data)
-	activate Users_DBMS
+	activate eMSP_registrationService
+	eMSP_registrationService->user_DBMS_API:checkUser(Data)
+	activate user_DBMS_API
 
 
 	alt isRegistered
 
-	Users_DBMS-->eMSP_RegistrationService:isRegistered
-    deactivate Users_DBMS
-    eMSP_RegistrationService-->SigningActivity:OK
-    deactivate eMSP_RegistrationService
-    SigningActivity-->registered User:Successfull login
+	user_DBMS_API-->eMSP_registrationService:isRegistered
+    deactivate user_DBMS_API
+    eMSP_registrationService-->appSigningActivity:OK
+    deactivate eMSP_registrationService
+    appSigningActivity-->registered User:Successfull login
     
-    SigningActivity->MainActivity:StartMainActivity
-    deactivate SigningActivity
-    activate MainActivity
-    MainActivity-->registered User:Show
+    appSigningActivity->appMainActivity:StartMainActivity
+    deactivate appSigningActivity
+    activate appMainActivity
+    appMainActivity-->registered User:Show
     space
-    deactivate MainActivity
+    deactivate appMainActivity
     
    
 
 	else User already registered
-    activate Users_DBMS
-    Users_DBMS-->eMSP_RegistrationService:isNotRegistered
-	deactivate Users_DBMS
-    activate eMSP_RegistrationService
-    eMSP_RegistrationService-->SigningActivity:Failed
-    deactivate eMSP_RegistrationService
-    activate SigningActivity
-    SigningActivity-->registered User:Failed
+    activate user_DBMS_API
+    user_DBMS_API-->eMSP_registrationService:isNotRegistered
+	deactivate user_DBMS_API
+    activate eMSP_registrationService
+    eMSP_registrationService-->appSigningActivity:Failed
+    deactivate eMSP_registrationService
+    activate appSigningActivity
+    appSigningActivity-->registered User:Failed
     space
-    deactivate SigningActivity
+    deactivate appSigningActivity
     
     
 	end
 else notValid
 
-activate SigningActivity
-SigningActivity-->registered User:Invalid data
+activate appSigningActivity
+appSigningActivity-->registered User:Invalid data
 space 
-deactivate SigningActivity
+deactivate appSigningActivity
 end 

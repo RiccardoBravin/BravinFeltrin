@@ -1,99 +1,99 @@
 title User registration
 
 actor Unregistered User
-participant MainActivity
-participant SigningActivity
-participant eMSP_RegistrationService
+participant appMainActivity
+participant appSigningActivity
+participant eMSP_registrationService
 database Users DBMS
-participant PaymentAPI
+participant payment_API
 
 
 
-activate MainActivity
+activate appMainActivity
 
-Unregistered User->MainActivity:Open APP
+Unregistered User->appMainActivity:Open APP
 
-MainActivity->MainActivity:isLogged()
+appMainActivity->appMainActivity:isLogged()
 
-activate MainActivity
-MainActivity->>SigningActivity:StartSigningActivity
-deactivate MainActivity
-deactivate MainActivity
+activate appMainActivity
+appMainActivity->>appSigningActivity:StartSigningActivity
+deactivate appMainActivity
+deactivate appMainActivity
 
-activate SigningActivity
-SigningActivity-->Unregistered User: ShowInterface
-
-
-
-Unregistered User->SigningActivity:Click register button
-
-Unregistered User<--SigningActivity:ShowRegistrationForm
+activate appSigningActivity
+appSigningActivity-->Unregistered User: ShowInterface
 
 
-Unregistered User->SigningActivity:Submit data
 
-SigningActivity->SigningActivity:ValidateInput()
+Unregistered User->appSigningActivity:Click register button
+
+Unregistered User<--appSigningActivity:ShowRegistrationForm
+
+
+Unregistered User->appSigningActivity:Submit data
+
+appSigningActivity->appSigningActivity:ValidateInput()
 
 alt isValid
 
-	SigningActivity->eMSP_RegistrationService:newUser(Data)
+	appSigningActivity->eMSP_registrationService:newUser(Data)
 	
-	activate eMSP_RegistrationService
-	eMSP_RegistrationService->Users DBMS:inserIncompleteUser(Data)
+	activate eMSP_registrationService
+	eMSP_registrationService->Users DBMS:inserIncompleteUser(Data)
 	activate Users DBMS
 
 
 	alt User inserted
 
-	Users DBMS-->eMSP_RegistrationService:Completed
+	Users DBMS-->eMSP_registrationService:Completed
     deactivate Users DBMS
 
-	eMSP_RegistrationService->eMSP_RegistrationService:verifyMail(Mail)
+	eMSP_registrationService->eMSP_registrationService:verifyMail(Mail)
     
     
 	
     
     	
-    eMSP_RegistrationService->PaymentAPI:checkPaymentMethod
-    activate PaymentAPI
-   PaymentAPI-->eMSP_RegistrationService:ValidPaymentMethod
-    deactivate PaymentAPI
+    eMSP_registrationService->payment_API:checkPaymentMethod
+    activate payment_API
+   payment_API-->eMSP_registrationService:ValidPaymentMethod
+    deactivate payment_API
     
-    eMSP_RegistrationService->Users DBMS:ActivateUser
+    eMSP_registrationService->Users DBMS:ActivateUser
     activate Users DBMS
-    Users DBMS-->eMSP_RegistrationService:Activated
+    Users DBMS-->eMSP_registrationService:Activated
     deactivate Users DBMS
-    eMSP_RegistrationService-->SigningActivity:OK
-    deactivate eMSP_RegistrationService
-    SigningActivity-->Unregistered User:Successfull signin
+    eMSP_registrationService-->appSigningActivity:OK
+    deactivate eMSP_registrationService
+    appSigningActivity-->Unregistered User:Successfull signin
     
-    SigningActivity->MainActivity:StartMainActivity
-    deactivate SigningActivity
-    activate MainActivity
-    MainActivity-->Unregistered User:Show
+    appSigningActivity->appMainActivity:StartMainActivity
+    deactivate appSigningActivity
+    activate appMainActivity
+    appMainActivity-->Unregistered User:Show
     space
-    deactivate MainActivity
+    deactivate appMainActivity
     
    
 
 	else User already registered
     activate Users DBMS
-    Users DBMS-->eMSP_RegistrationService:FailedInsertion
+    Users DBMS-->eMSP_registrationService:FailedInsertion
 	deactivate Users DBMS
-    activate eMSP_RegistrationService
-    eMSP_RegistrationService-->SigningActivity:Failed
-    deactivate eMSP_RegistrationService
-    activate SigningActivity
-    SigningActivity-->Unregistered User:Failed
+    activate eMSP_registrationService
+    eMSP_registrationService-->appSigningActivity:Failed
+    deactivate eMSP_registrationService
+    activate appSigningActivity
+    appSigningActivity-->Unregistered User:Failed
     space
-    deactivate SigningActivity
+    deactivate appSigningActivity
     
     
 	end
 else notValid
 
-activate SigningActivity
-SigningActivity-->Unregistered User:Invalid data
+activate appSigningActivity
+appSigningActivity-->Unregistered User:Invalid data
 space 
-deactivate SigningActivity
+deactivate appSigningActivity
 end

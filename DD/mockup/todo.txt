@@ -1,0 +1,2 @@
+Fix orari booking state
+delete google facebook twitt

@@ -41,7 +41,7 @@ alt validToken
                 activate chargingColumn_API
         eMSP user->chargingColumn_API:plugCar(socket)
 		linear off
-        chargingColumn_API-->>CPMS_chargingService:carPlugged(chargeLevel, socket)	
+        chargingColumn_API-->CPMS_chargingService:carPlugged(chargeLevel, socket)	
         linear on
 		CPMS_chargingService->BatteryPack_API:getStoredPrice
 		activate BatteryPack_API
@@ -63,7 +63,7 @@ alt validToken
         activate CPMS_chargingService
         space
         deactivate CPMS_chargingService
-        loop until full charge or timeout
+        loop until full charge or timeout, every minute
         CPMS_chargingService->>chargingColumn_API:levelCheck
         chargingColumn_API-->CPMS_chargingService:chargingLevel
         end
@@ -76,19 +76,35 @@ alt validToken
         	activate eMSP_notificationService
         	eMSP_notificationService-->CPMS_chargingService:received
         	activate appNotificationService
-			appNotificationService->>eMSP_notificationService: periodicNotificationCheck
+			loop every minute, until chargeOut notification is received
+            appNotificationService->>eMSP_notificationService: periodicNotificationCheck
 	        eMSP_notificationService-->appNotificationService:chargeOut
+            end
             space 
             deactivate eMSP_notificationService
+            
     	    appNotificationService->eMSP user:chargeOut
+           
+           
             space
             deactivate appNotificationService
-            
+            CPMS_chargingService->chargingColumn_API:isUnplugged
         	eMSP user->chargingColumn_API:unplugCar
-            chargingColumn_API->CPMS_chargingService:carUnplugged
+            
+linear off
+chargingColumn_API-->CPMS_chargingService:carUnplugged
             #COlumn api non fa richiesta diretta a cpms ma dopo aver fermato la ricarica questo aspetta che l'user disconnetta il plug, poi prepara il conto
             deactivate chargingColumn_API
-            CPMS_chargingService->appChargingActivity:totalBill
+            activate eMSP_notificationService
+            CPMS_chargingService->eMSP_notificationService:notifyTotalBill
+            activate appNotificationService
+            loop every minute, until totalBill notification is received
+			appNotificationService->>eMSP_notificationService: periodicNotificationCheck
+	        eMSP_notificationService-->appNotificationService:totalBill
+			end
+            appNotificationService->appChargingActivity:totalBill
+            
+            
             #CPMS CANNOT MAKE REQUEST DIRECTLY TO APP
             # puoi fare che dopo essere stato avvisato che il tempo è scaduto chiede per il totale 
             #che poi in realtà NON ci tenevamo direttamente il max prima della prenotazione e poi andavamo a rimborsare il rimanente??
@@ -97,7 +113,7 @@ alt validToken
             payment_API-->appChargingActivity:done
 			deactivate payment_API
             appChargingActivity-->eMSP user:paymentDone
-            appChargingActivity-->CPMS_chargingService:paymentDone
+            appChargingActivity->CPMS_chargingService:paymentDone
             deactivate CPMS_chargingService
             deactivate appChargingActivity
           

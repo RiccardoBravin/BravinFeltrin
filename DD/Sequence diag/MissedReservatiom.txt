@@ -18,10 +18,12 @@ activate eMSP_notificationService
 activate app_notificationService
 CPMS_ReservationService->eMSP_notificationService:missedReservation(data)
 eMSP_notificationService-->CPMS_ReservationService: OK
-app_notificationService->>eMSP_notificationService:periodicNotificationCheck
+loop every minute
+app_notificationService->eMSP_notificationService:notificationCheck
 
 alt missedReservation 
 eMSP_notificationService-->app_notificationService: missedReservation(data)
 app_notificationService->eMSP registered user:missedReservationNotification
+end
 end
 

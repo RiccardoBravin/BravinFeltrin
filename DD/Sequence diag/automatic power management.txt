@@ -5,6 +5,7 @@ participant DSOs_API
 participant BatteryPack_API
 
 activate CPMS_powerManagerService
+loop every hour
 CPMS_powerManagerService->>DSOs_API:periodicCostCheck
 activate DSOs_API
 DSOs_API-->CPMS_powerManagerService:prices
@@ -34,4 +35,5 @@ alt Not full
         BatteryPack_API-->CPMS_powerManagerService:processEnd
         deactivate BatteryPack_API
     end    
+end
 end

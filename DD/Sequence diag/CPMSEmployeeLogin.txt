@@ -1,16 +1,16 @@
 title CPMS employee login
 
 actor CPMS employee
-participant CPMS_graphics
+participant CPMS_GUI
 participant CPMS_authorizationService
 participant CPOs_API
 
 
-activate CPMS_graphics
-CPMS employee->CPMS_graphics:fill login form
+activate CPMS_GUI
+CPMS employee->CPMS_GUI:fill login form
 
 	
-CPMS_graphics-> CPMS_authorizationService: Login(user,psw)
+CPMS_GUI-> CPMS_authorizationService:login(user,psw)
 activate CPMS_authorizationService
 CPMS_authorizationService->CPMS_authorizationService:ValidateInput()
 
@@ -20,16 +20,16 @@ alt valid data
 
 	
     
-    CPMS_authorizationService->CPOs_API:verifyLogin(user,psw)
+    CPMS_authorizationService->CPOs_API:verifyUserCredentials(user,psw)
 	activate CPOs_API
 	alt employee authorized
     
     CPOs_API-->CPMS_authorizationService:Authorized
     deactivate CPOs_API
-    CPMS_authorizationService--> CPMS_graphics: Authorized
+    CPMS_authorizationService--> CPMS_GUI: Authorized
     deactivate CPMS_authorizationService
     
-    CPMS_graphics-->CPMS employee:Successfull login
+    CPMS_GUI-->CPMS employee:Successfull login
     else employee not authorized
     activate CPMS_authorizationService
  	activate CPOs_API
@@ -37,14 +37,14 @@ alt valid data
     CPOs_API-->CPMS_authorizationService:Unauthorized
     
     deactivate CPOs_API
-    CPMS_authorizationService--> CPMS_graphics: Unauthorized
+    CPMS_authorizationService--> CPMS_GUI: Unauthorized
     deactivate CPMS_authorizationService
-    CPMS_graphics-->CPMS employee:Failed
+    CPMS_GUI-->CPMS employee:Failed
     space
 end
 else invalid data
 	activate CPMS_authorizationService
-    CPMS_authorizationService-->CPMS_graphics:Invalid data
-	CPMS_graphics-->CPMS employee:Invalid data
+    CPMS_authorizationService-->CPMS_GUI:Invalid data
+	CPMS_GUI-->CPMS employee:Invalid data
 
 end 

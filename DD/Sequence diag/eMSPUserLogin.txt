@@ -4,7 +4,7 @@ actor registered User
 participant appMainActivity
 participant appSigningActivity
 participant eMSP_registrationService
-participant user_DBMS_API
+participant Users_DBMS_API
 
 
 activate appMainActivity
@@ -28,23 +28,23 @@ registered User->appSigningActivity:Click login button
 registered User<--appSigningActivity:ShowLoginForm
 
 
-registered User->appSigningActivity:Submit data
+registered User->appSigningActivity:login form submitted
 
-appSigningActivity->appSigningActivity:ValidateInput()
+appSigningActivity->appSigningActivity:ValidateInput(data)
 
 alt isValid
 
-	appSigningActivity->eMSP_registrationService:Login(Data)
+	appSigningActivity->eMSP_registrationService:login(user,psw)
 	
 	activate eMSP_registrationService
-	eMSP_registrationService->user_DBMS_API:checkUser(Data)
-	activate user_DBMS_API
+	eMSP_registrationService->Users_DBMS_API:find(user,psw)
+	activate Users_DBMS_API
 
 
 	alt isRegistered
 
-	user_DBMS_API-->eMSP_registrationService:isRegistered
-    deactivate user_DBMS_API
+	Users_DBMS_API-->eMSP_registrationService:isRegistered
+    deactivate Users_DBMS_API
     eMSP_registrationService-->appSigningActivity:OK
     deactivate eMSP_registrationService
     appSigningActivity-->registered User:Successfull login
@@ -59,9 +59,9 @@ alt isValid
    
 
 	else User already registered
-    activate user_DBMS_API
-    user_DBMS_API-->eMSP_registrationService:isNotRegistered
-	deactivate user_DBMS_API
+    activate Users_DBMS_API
+    Users_DBMS_API-->eMSP_registrationService:isNotRegistered
+	deactivate Users_DBMS_API
     activate eMSP_registrationService
     eMSP_registrationService-->appSigningActivity:Failed
     deactivate eMSP_registrationService

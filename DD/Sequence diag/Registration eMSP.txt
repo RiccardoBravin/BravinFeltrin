@@ -4,10 +4,12 @@ actor Unregistered User
 participant appMainActivity
 participant appSigningActivity
 participant eMSP_registrationService
-partecipant Users DBMS
+partecipant Users_DBMS
 participant payment_API
 
 
+
+participant Users_DBMS
 
 activate appMainActivity
 
@@ -30,23 +32,23 @@ Unregistered User->appSigningActivity:Click register button
 Unregistered User<--appSigningActivity:ShowRegistrationForm
 
 
-Unregistered User->appSigningActivity:Submit data
+Unregistered User->appSigningActivity:Submit registration data
 
 appSigningActivity->appSigningActivity:ValidateInput()
 
 alt isValid
 
-	appSigningActivity->eMSP_registrationService:newUser(Data)
+	appSigningActivity->eMSP_registrationService:register(Data)
 	
 	activate eMSP_registrationService
-	eMSP_registrationService->Users DBMS:inserIncompleteUser(Data)
-	activate Users DBMS
+	eMSP_registrationService->Users_DBMS:insertUser(unverifiedUser)
+	activate Users_DBMS
 
 
 	alt User inserted
 
-	Users DBMS-->eMSP_registrationService:Completed
-    deactivate Users DBMS
+	Users_DBMS-->eMSP_registrationService:Completed
+    deactivate Users_DBMS
 
 	eMSP_registrationService->eMSP_registrationService:verifyMail(Mail)
     
@@ -54,15 +56,15 @@ alt isValid
 	
     
     	
-    eMSP_registrationService->payment_API:checkPaymentMethod
+    eMSP_registrationService->payment_API:verifyPaymentMethod()
     activate payment_API
    payment_API-->eMSP_registrationService:ValidPaymentMethod
     deactivate payment_API
     
-    eMSP_registrationService->Users DBMS:ActivateUser
-    activate Users DBMS
-    Users DBMS-->eMSP_registrationService:Activated
-    deactivate Users DBMS
+    eMSP_registrationService->Users_DBMS:update(User)
+    activate Users_DBMS
+    Users_DBMS-->eMSP_registrationService:Activated
+    deactivate Users_DBMS
     eMSP_registrationService-->appSigningActivity:OK
     deactivate eMSP_registrationService
     appSigningActivity-->Unregistered User:Successfull signin
@@ -77,9 +79,9 @@ alt isValid
    
 
 	else User already registered
-    activate Users DBMS
-    Users DBMS-->eMSP_registrationService:FailedInsertion
-	deactivate Users DBMS
+    activate Users_DBMS
+    Users_DBMS-->eMSP_registrationService:FailedInsertion
+	deactivate Users_DBMS
     activate eMSP_registrationService
     eMSP_registrationService-->appSigningActivity:Failed
     deactivate eMSP_registrationService

@@ -14,12 +14,6 @@ activate appMainActivity
 
 Registered User->appMainActivity:Open APP
 
-appMainActivity->appMainActivity:isLogged()
-
-activate appMainActivity
-space
-deactivate appMainActivity
-
 appMainActivity-->Registered User: ShowMap
 
 alt User wants to define search location
@@ -28,28 +22,28 @@ alt User wants to define search location
     
 else Book NOW option
 	Registered User->appMainActivity:Select Book NOW
-	appMainActivity->appMainActivity:LocateUser()
+	appMainActivity->appMainActivity:locateUser()
 	
 end
 
-appMainActivity->CPOs_API:RequestCS(loc)
+appMainActivity->CPOs_API:getCPMSs(loc)
 activate CPOs_API
 
 
 
-CPOs_API-->appMainActivity:CSList
+CPOs_API-->appMainActivity:CPMSs list
 deactivate CPOs_API
 
 space
 
 activate appMainActivity
 loop for each CS in list
-appMainActivity->CPMS_InfoService:RequestInfo()
+appMainActivity->CPMS_InfoService:getInfo()
 activate CPMS_InfoService
 alt Response from CPMS received
 CPMS_InfoService -->appMainActivity:CSInfo
 
-appMainActivity->appMainActivity:InsertCSMarkers(cs)
+appMainActivity->appMainActivity:InsertMapMarkers(CS)
 end
 
 deactivate CPMS_InfoService
@@ -72,7 +66,7 @@ Registered User->appReservationActivity:Fill form data
 
 appReservationActivity->appReservationActivity:ValidateInput()
 
-appReservationActivity->CPMS_ReservationService: RequestReservation(date,info)
+appReservationActivity->CPMS_ReservationService:RequestReservation(res)
 activate CPMS_ReservationService
 
 CPMS_ReservationService->reservation_DBMS_API:insert(reservation)
@@ -85,7 +79,7 @@ alt correctly inserted
     deactivate CPMS_ReservationService
     appReservationActivity->appReservationActivity:CalculateFee
     
-    appReservationActivity->Payment_API:RequestPayment
+    appReservationActivity->Payment_API:pay(info,bill)
     activate Payment_API
     
     alt Payment Completed
@@ -105,7 +99,7 @@ alt correctly inserted
         deactivate Payment_API
         appReservationActivity->CPMS_ReservationService:remove(res)
         activate CPMS_ReservationService
-        CPMS_ReservationService->reservation_DBMS_API:remove(res)
+        CPMS_ReservationService->reservation_DBMS_API:remove(reservation)
         activate reservation_DBMS_API
         reservation_DBMS_API-->CPMS_ReservationService:Confirmation
         deactivate reservation_DBMS_API

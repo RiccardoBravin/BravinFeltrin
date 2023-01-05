@@ -1,66 +1,66 @@
 title Change DSO manually
 
 actor CPO Employee
-participant UserInterfaceManager
+participant CPMS_GUI
 participant CPMS_powerManagerService
 participant DSO_API
 
 linear
 
-activate UserInterfaceManager
+activate CPMS_GUI
 
 opt search for DSO  
-	CPO Employee->UserInterfaceManager:select show DSO list
-	UserInterfaceManager->CPMS_powerManagerService: RetrieveDSOList()
+	CPO Employee->CPMS_GUI:select show DSO list
+	CPMS_GUI->CPMS_powerManagerService:getDSOs()
 	activate CPMS_powerManagerService
-    CPMS_powerManagerService->DSO_API:RetrieveList()
+    CPMS_powerManagerService->DSO_API:getDSOs()
     activate DSO_API
-    DSO_API-->CPMS_powerManagerService:DSOs info list
+    DSO_API-->CPMS_powerManagerService:DSO list
     deactivate DSO_API
-    CPMS_powerManagerService--> UserInterfaceManager :DSOs info list
+    CPMS_powerManagerService-->CPMS_GUI :DSO list
     deactivate CPMS_powerManagerService
-    UserInterfaceManager -->CPO Employee:Show DSOs list
+    CPMS_GUI -->CPO Employee:Show DSOs list
     
     opt filter DSOs 
-    CPO Employee ->UserInterfaceManager: filter DSOs list
-    UserInterfaceManager->CPMS_powerManagerService:requestFiltering(filter)
+    CPO Employee ->CPMS_GUI:filter DSOs list
+    CPMS_GUI->CPMS_powerManagerService:filterDSOs(filter)
     activate CPMS_powerManagerService
     
-    CPMS_powerManagerService ->CPMS_powerManagerService:filterList()
+    CPMS_powerManagerService ->CPMS_powerManagerService:applyFilter(list,filter)
     
-    CPMS_powerManagerService -->UserInterfaceManager:filtered DSOs list
+    CPMS_powerManagerService -->CPMS_GUI:filtered DSOs list
     deactivate CPMS_powerManagerService
-    UserInterfaceManager -->CPO Employee:Show filtered DSOs list
+    CPMS_GUI -->CPO Employee:Show filtered DSOs list
     end
     
 end
 
-CPO Employee->UserInterfaceManager:Select change DSO
-UserInterfaceManager-->CPO Employee:show DSO selection form
+CPO Employee->CPMS_GUI:Select change DSO
+CPMS_GUI-->CPO Employee:show DSO selection form
 
-CPO Employee ->UserInterfaceManager:fill DSO change form
+CPO Employee ->CPMS_GUI:fill DSO change form
 
-UserInterfaceManager->CPMS_powerManagerService:RequestDSOChange(DSO)
+CPMS_GUI->CPMS_powerManagerService:RequestDSOChange(form)
 activate CPMS_powerManagerService
 
-CPMS_powerManagerService->DSO_API:stipulateNewContract()
+CPMS_powerManagerService->DSO_API:stipulateContract(DSO)
 activate DSO_API
 
 alt contract stipulated
 DSO_API-->CPMS_powerManagerService:Completed
 deactivate DSO_API
-CPMS_powerManagerService-->UserInterfaceManager:Completed
+CPMS_powerManagerService-->CPMS_GUI:Completed
 deactivate CPMS_powerManagerService
-UserInterfaceManager-->CPO Employee:show contract report
+CPMS_GUI-->CPO Employee:show contract report
 
 else error in contract stipulation
 activate DSO_API
 activate CPMS_powerManagerService
 DSO_API-->CPMS_powerManagerService:Failed
 deactivate DSO_API
-CPMS_powerManagerService-->UserInterfaceManager:Failed
+CPMS_powerManagerService-->CPMS_GUI:Failed
 deactivate CPMS_powerManagerService
-UserInterfaceManager-->CPO Employee:show error
+CPMS_GUI-->CPO Employee:show error
 
 
 end 

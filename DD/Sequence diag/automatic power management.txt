@@ -6,33 +6,34 @@ participant BatteryPack_API
 
 activate CPMS_powerManagerService
 loop every hour
-CPMS_powerManagerService->>DSOs_API:periodicCostCheck
+
+CPMS_powerManagerService->>DSOs_API:getDSOs()
 activate DSOs_API
-DSOs_API-->CPMS_powerManagerService:prices
+DSOs_API-->CPMS_powerManagerService:DSO list
 deactivate DSOs_API
 alt new prices better than old ones 
-	CPMS_powerManagerService->CPMS_powerManagerService:selectBetterOne
-	CPMS_powerManagerService->DSOs_API:stipulateNewContract
+	CPMS_powerManagerService->CPMS_powerManagerService:selectBestDSO()
+	CPMS_powerManagerService->DSOs_API:stipulateContract(DSO)
     activate DSOs_API
-	DSOs_API-->CPMS_powerManagerService:done
+	DSOs_API-->CPMS_powerManagerService:Done
     deactivate DSOs_API
 end
 
-CPMS_powerManagerService->BatteryPack_API:getBatteryLevel
+CPMS_powerManagerService->BatteryPack_API:getLevel()
 activate BatteryPack_API
 BatteryPack_API-->CPMS_powerManagerService:batteryLevel
 alt Not full
-	CPMS_powerManagerService->BatteryPack_API:getStoredEnergyPrice
+	CPMS_powerManagerService->BatteryPack_API:getEnergyValue()
 	BatteryPack_API-->CPMS_powerManagerService:storedEnergyPrice
     deactivate BatteryPack_API
     
     alt Current price lower than stored one or is night time
-        CPMS_powerManagerService->BatteryPack_API:fillBatteries
+        CPMS_powerManagerService->BatteryPack_API:setCharge()
         activate BatteryPack_API 
-        #BatteryPack_API-->CPMS_powerManagerService:processStart
+        BatteryPack_API-->CPMS_powerManagerService:processStarted
         space
         space
-        BatteryPack_API-->CPMS_powerManagerService:processEnd
+        BatteryPack_API-->CPMS_powerManagerService:processEnded
         deactivate BatteryPack_API
     end    
 end

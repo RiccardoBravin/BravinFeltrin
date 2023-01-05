@@ -1,5 +1,6 @@
 @startuml Complete diagram
 
+
 namespace eMSP_APP <<frame>>{
    	interface OSInterface{
     	+ requestHandler(request)
@@ -13,6 +14,7 @@ namespace eMSP_APP <<frame>>{
 		+ chargeButtonPressed()
 		+ chargingStationSelected(CS)
 		+ bookForChargeButtonPressed()
+		+ CSSelected()
 		- isLogged()
 		- updatePosition(search_string)
 		- locateUser()
@@ -20,7 +22,8 @@ namespace eMSP_APP <<frame>>{
 	}	
 
 	interface ChargingInterface{
-		+ committToken()
+		+ committToken(token)
+		+ setBill(total)
 		- parseToken()
 		- prepareBill()
 	}
@@ -65,8 +68,9 @@ namespace eMSP_Server <<frame>>{
 	}	
 
 	interface NotificationInterface{
-		+ missedRservation(user)
-		+ chargeCompleted(user)
+		+ missedReservation(token)
+		+ chargeCompleted(token)
+		+ finalBilling(token, total)
 		+ getNotifications(user)
 	}
 
@@ -84,7 +88,7 @@ namespace CPMS_Server <<frame>>{
 		+ requestHandler(request)
    	}
 
-	interface GraphicsInterface{
+	interface GUIInterface{
 		+ changeDSOSelected()
 		+ showDSOList()
 		+ filterDSOs(filter)
@@ -97,13 +101,12 @@ namespace CPMS_Server <<frame>>{
    	interface PowerManagerInterface{
 		+ getDSOs()
 		+ filterDSOs(filter)
-		+ requestDSOChange(DSO)
-		+ selectBestDSO()		
+		+ requestDSOChange(form)	
 		+ getBatteryInfo()
 		+ setBatteryTarget(val)
 		- applyFilter(list, filter)
 		- batteryMonitoring()
-
+		- selectBestDSO()
 	}	
 
 	interface ReservationInterface{
@@ -133,8 +136,8 @@ namespace CPMS_Server <<frame>>{
 	CPMS_API..|>ChargingInterface
 	
 
-	GraphicsInterface..|>PowerManagerInterface
-	GraphicsInterface..|>AuthorizationInterface
+	GUIInterface..|>PowerManagerInterface
+	GUIInterface..|>AuthorizationInterface
 
 
 
@@ -143,7 +146,7 @@ namespace CPMS_Server <<frame>>{
 
 package Users_DBMS <<Database>>{
 		interface Users_DBMS_API{
-			+ find(name,psw)
+			+ find(user,psw)
 			+ insert(User)
 			+ update(User)
 		}
@@ -159,7 +162,7 @@ package Reservations_DBMS <<Database>>{
 }
 
 interface CPOs_API{
-	+ getCPMSs() 
+	+ getCPMSs(loc) 
 	+ verifyUserCredentials(user, psw)
 }
 
@@ -176,10 +179,12 @@ interface Payment_API{
 interface ChargingColumn_API{
 	+ getFreeSockets()
 	+ getChargingStatus(socket)
+	+ isSocketPlugged()
 	+ isSocketUnplugged(socket)
 }
 
 interface BatteryPack_API{
+	+ getStatus()
 	+ getLevel()
 	+ getEnergyValue()
 	+ fillBattery()
@@ -190,6 +195,7 @@ interface BatteryPack_API{
 interface Switcher_API{
 	+ startBatterySupply()
 	+ startDSOSupply()
+	+ stopSupply(column,socket)
 }
 
 
@@ -200,7 +206,7 @@ eMSP_APP.OSInterface..|>Payment_API
 
 
 eMSP_Server.RegistrationInterface..|>Users_DBMS_API
-eMSP_Server.eMSP_API..|>Payment_API
+eMSP_Server.RegistrationInterface..|>Payment_API
 
 CPMS_Server.CPMS_API..|>eMSP_Server.eMSP_API
 
@@ -215,13 +221,9 @@ CPMS_Server.ChargingInterface..|>ChargingColumn_API
 CPMS_Server.ChargingInterface..|>Switcher_API
 CPMS_Server.ChargingInterface..|>Reservations_DBMS_API
 
-CPMS_Server.ReservationInterface..|>Reservations_DBMS_API
+CPMS_Server.ReservationInterface..l|>Reservations_DBMS_API
 
 CPMS_Server.AuthorizationInterface..|>CPOs_API
-
-
-
-
 
 @enduml
 

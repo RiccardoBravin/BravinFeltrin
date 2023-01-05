@@ -1,29 +1,29 @@
 title Manually set battery target
 
 actor CPO Employee
-participant CPMS_graphics
+participant CPMS_GUI
 participant CPMS_powerManagerService
 participant batteryPackAPI
 
 
 linear
 
-activate CPMS_graphics
+activate CPMS_GUI
 activate batteryPackAPI
 
-	CPO Employee->CPMS_graphics:select battery control 
+	CPO Employee->CPMS_GUI:select battery control 
     
-    CPMS_graphics -> CPMS_powerManagerService: requestBatteryInfo()
+    CPMS_GUI -> CPMS_powerManagerService:getBatteryInfo()
     activate CPMS_powerManagerService
-    CPMS_powerManagerService->batteryPackAPI: requestInfo()
+    CPMS_powerManagerService->batteryPackAPI:getStatus()
     
-    batteryPackAPI-->CPMS_powerManagerService:BatteryInfo
-    CPMS_powerManagerService-->CPMS_graphics: BatteryInfo
+    batteryPackAPI-->CPMS_powerManagerService:Pack info
+    CPMS_powerManagerService-->CPMS_GUI:Pack info
     deactivate CPMS_powerManagerService
-    CPMS_graphics-->CPO Employee:show Battery info 
+    CPMS_GUI-->CPO Employee:show Battery info 
     
-    CPO Employee->CPMS_graphics:select new battery target
-    CPMS_graphics->CPMS_powerManagerService:newBatteryTarget(level)
+    CPO Employee->CPMS_GUI:select new battery target
+    CPMS_GUI->CPMS_powerManagerService:newBatteryTarget(level)
     activate CPMS_powerManagerService
     
     CPMS_powerManagerService->CPMS_powerManagerService:startBatteryMonitoring
@@ -31,11 +31,11 @@ activate batteryPackAPI
     
     
     
-    CPMS_powerManagerService-->CPMS_graphics:NewTargetSet
-    CPMS_graphics-->CPO Employee:new target set confirmation 
+    CPMS_powerManagerService-->CPMS_GUI:Target set
+    CPMS_GUI-->CPO Employee:new target set confirmation 
     
     loop periodic call
-    	CPMS_powerManagerService->batteryPackAPI: requestInfo()
+    	CPMS_powerManagerService->batteryPackAPI:getStatus()
     
     	batteryPackAPI-->CPMS_powerManagerService:BatteryInfo
     

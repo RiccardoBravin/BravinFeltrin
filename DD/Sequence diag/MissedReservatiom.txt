@@ -10,20 +10,20 @@ actor eMSP registered user
 activate CPMS_ReservationService
 activate Reservation DBMS
 
-CPMS_ReservationService->Reservation DBMS:deleteReservation
+CPMS_ReservationService->Reservation DBMS:cancelReservation(res)
 Reservation DBMS-->CPMS_ReservationService:done
 deactivate Reservation DBMS
 
 activate eMSP_notificationService
 activate app_notificationService
-CPMS_ReservationService->eMSP_notificationService:missedReservation(data)
+CPMS_ReservationService->eMSP_notificationService:missedReservation(token)
 eMSP_notificationService-->CPMS_ReservationService: OK
 loop every minute
-app_notificationService->eMSP_notificationService:notificationCheck
+app_notificationService->eMSP_notificationService:getNotifications(user)
 
-alt missedReservation 
-eMSP_notificationService-->app_notificationService: missedReservation(data)
-app_notificationService->eMSP registered user:missedReservationNotification
+alt missedReservation notification present
+eMSP_notificationService-->app_notificationService:Missed reservation
+app_notificationService->eMSP registered user:missed reservation notification
 end
 end
 

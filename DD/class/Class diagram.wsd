@@ -200,6 +200,7 @@ eMSP_APP.OSInterface..|>Payment_API
 
 
 eMSP_Server.RegistrationInterface..|>Users_DBMS_API
+eMSP_Server.eMSP_API..|>Payment_API
 
 CPMS_Server.CPMS_API..|>eMSP_Server.eMSP_API
 

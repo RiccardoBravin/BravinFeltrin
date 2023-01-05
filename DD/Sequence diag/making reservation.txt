@@ -103,10 +103,14 @@ alt correctly inserted
         activate appReservationActivity
         Payment_API-->appReservationActivity:Payment rejected
         deactivate Payment_API
-        appReservationActivity->reservation_DBMS_API:remove(res)
+        appReservationActivity->CPMS_ReservationService:remove(res)
+        activate CPMS_ReservationService
+        CPMS_ReservationService->reservation_DBMS_API:remove(res)
         activate reservation_DBMS_API
-        reservation_DBMS_API-->appReservationActivity:Confirmation
+        reservation_DBMS_API-->CPMS_ReservationService:Confirmation
         deactivate reservation_DBMS_API
+        CPMS_ReservationService-->appReservationActivity:Confirmation
+        deactivate CPMS_ReservationService
         appReservationActivity-->Registered User:Notify Reservation Failed (payment rejected)
     	space
         deactivate appReservationActivity

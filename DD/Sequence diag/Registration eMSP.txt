@@ -16,7 +16,7 @@ Unregistered User->appMainActivity:Open APP
 appMainActivity->appMainActivity:isLogged()
 
 activate appMainActivity
-appMainActivity->>appSigningActivity:StartSigningActivity
+appMainActivity->appSigningActivity:StartSigningActivity
 deactivate appMainActivity
 deactivate appMainActivity
 

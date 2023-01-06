@@ -1,0 +1,6 @@
+@startuml
+[User_DBMS]-down->[registrationService]
+[User_DBMS]-down->[notificationService]
+[registrationService]-d->[eMSP_router]
+[notificationService]-d->[eMSP_router]
+@enduml

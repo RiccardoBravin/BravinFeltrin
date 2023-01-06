@@ -1,0 +1,8 @@
+@startuml
+[CPMS_router]-down->[CPMS_chargingService]
+[CPMS_router]-down->[CPMS_infoService]
+[CPMS_router]-down->[CPMS_reservationService]
+[CPMS_reservationService]-d->[Reservation_DBMS]
+[CPMS_infoService]-d->[Reservation_DBMS]
+[CPMS_chargingService]-d->[Reservation_DBMS]
+@enduml

@@ -7,7 +7,7 @@ participant BatteryPack_API
 activate CPMS_powerManagerService
 loop every hour
 
-CPMS_powerManagerService->>DSOs_API:getDSOs()
+CPMS_powerManagerService->DSOs_API:getDSOs()
 activate DSOs_API
 DSOs_API-->CPMS_powerManagerService:DSO list
 deactivate DSOs_API

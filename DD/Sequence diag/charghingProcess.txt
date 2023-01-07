@@ -13,11 +13,15 @@ participant BatteryPack_API
 participant Reservations_DBMS_API
 
 
+activate appNotificationService
+activate eMSP_notificationService
+
 eMSP user->appMainActivity:open APP
 activate appMainActivity
 appMainActivity->appChargingActivity:startChargingActivity
 
 activate appChargingActivity
+deactivate appMainActivity
 
 alt NFC
 eMSP user->appChargingActivity:nfcToken
@@ -53,7 +57,7 @@ alt validToken
 			activate Switcher_API
 			Switcher_API-->CPMS_chargingService:OK
 			deactivate Switcher_API
-		else 
+		else  
 			CPMS_chargingService->Switcher_API:startDSOSupply()
 			activate Switcher_API
 			Switcher_API-->CPMS_chargingService:OK
@@ -64,7 +68,7 @@ alt validToken
         space
         deactivate CPMS_chargingService
         loop until full charge or timeout, every minute
-        CPMS_chargingService->>chargingColumn_API:getChargingStatus(socket)
+        CPMS_chargingService->chargingColumn_API:getChargingStatus(socket)
         chargingColumn_API-->CPMS_chargingService:chargeLevel
         end
         alt fullCharge or time-frame out
@@ -73,35 +77,35 @@ alt validToken
         	Switcher_API-->CPMS_chargingService:OK
         	deactivate Switcher_API
         	CPMS_chargingService->eMSP_notificationService:chargeCompleted(token)
-        	activate eMSP_notificationService
+        	
         	eMSP_notificationService-->CPMS_chargingService:received
-        	activate appNotificationService
+        	
 			loop every minute, until chargeOut notification is received
-            appNotificationService->>eMSP_notificationService:getNotifications(user)
+            appNotificationService->eMSP_notificationService:getNotifications(user)
 	        eMSP_notificationService-->appNotificationService:Notifications
             end
             space 
-            deactivate eMSP_notificationService
+            
             
     	    appNotificationService->eMSP user:Notify charge completed
            
            
             space
-            deactivate appNotificationService
+            
             CPMS_chargingService->chargingColumn_API:isSocketUnplugged(socket)
         	eMSP user->chargingColumn_API:unplugCar
             
 linear off
 chargingColumn_API-->CPMS_chargingService:vehicleUnplugged
-            #COlumn api non fa richiesta diretta a cpms ma dopo aver fermato la ricarica questo aspetta che l'user disconnetta il plug, poi prepara il conto
+  
             deactivate chargingColumn_API
-            activate eMSP_notificationService
+            
             CPMS_chargingService->eMSP_notificationService:finalBilling(token,total)
-            activate appNotificationService
+            
             eMSP_notificationService-->CPMS_chargingService:received
             deactivate CPMS_chargingService
             loop every minute, until totalBill notification is received
-			appNotificationService->>eMSP_notificationService:getNotifications(user)
+			appNotificationService->eMSP_notificationService:getNotifications(user)
 	        eMSP_notificationService-->appNotificationService:Notifications
 			end
             appNotificationService->appChargingActivity:setBill(total)
